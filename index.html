@@ -115,6 +115,7 @@
         .hero-stats {
             display: flex;
             gap: 30px;
+            flex-wrap: wrap;
         }
 
         .stat-item {
@@ -228,6 +229,112 @@
             opacity: 0.9;
         }
 
+        /* Блок выгоды */
+        .savings {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .savings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .saving-card {
+            background: linear-gradient(135deg, #f6f9fc 0%, #e6f0f5 100%);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .saving-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+        }
+
+        .saving-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .saving-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .saving-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .saving-compare {
+            margin: 15px 0;
+            padding: 10px 0;
+            border-top: 1px dashed #ccc;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .old-price {
+            font-size: 18px;
+            color: #999;
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+
+        .old-price span {
+            font-size: 14px;
+            color: #666;
+            text-decoration: none;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+
+        .new-price {
+            font-size: 26px;
+            font-weight: 800;
+            color: #667eea;
+            margin-top: 5px;
+        }
+
+        .saving-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            transition: opacity 0.3s;
+            margin-top: 20px;
+        }
+
+        .saving-button:hover {
+            opacity: 0.9;
+        }
+
         /* Товары */
         .products {
             background: white;
@@ -248,11 +355,25 @@
             border-radius: 15px;
             overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
         }
 
         .product-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 2;
         }
 
         .product-image {
@@ -276,11 +397,24 @@
             color: #333;
         }
 
+        .product-price-block {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .product-old-price {
+            font-size: 16px;
+            color: #999;
+            text-decoration: line-through;
+        }
+
         .product-price {
-            font-size: 20px;
+            font-size: 22px;
             color: #667eea;
             font-weight: 700;
-            margin-bottom: 10px;
         }
 
         .product-desc {
@@ -482,13 +616,13 @@
                 padding: 10px;
             }
 
-            .header, .hero, .categories, .products, .features, .how-it-works, .contacts {
+            .header, .hero, .categories, .products, .features, .how-it-works, .contacts, .savings {
                 padding: 20px;
             }
         }
 
         /* Анимации */
-        .header, .hero, .categories, .products, .features, .how-it-works, .contacts, .footer {
+        .header, .hero, .categories, .products, .features, .how-it-works, .contacts, .footer, .savings {
             animation: fadeIn 1s ease-out;
         }
 
@@ -538,6 +672,10 @@
                     <div class="stat-item">
                         <div class="stat-number">🤖</div>
                         <div class="stat-label">Telegram бот</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">-60%</div>
+                        <div class="stat-label">Скидки до 60%</div>
                     </div>
                 </div>
             </div>
@@ -591,51 +729,111 @@
             </div>
         </section>
 
-        <!-- Товары (только те что есть в JSON) -->
+        <!-- Блок ВЫГОДЫ: сравнение с Wildberries -->
+        <section class="savings">
+            <h2 class="section-title">💰 Выгода до 60% — цены ниже Wildberries</h2>
+            <div class="savings-grid">
+                <!-- Розовый стич -->
+                <div class="saving-card">
+                    <div class="saving-badge">🔥 -60%</div>
+                    <div class="saving-icon">🐻</div>
+                    <div class="saving-title">Розовый стич</div>
+                    <div class="saving-compare">
+                        <span class="old-price">500 ₽ <span>Wildberries</span></span>
+                        <div class="new-price">199 ₽</div>
+                    </div>
+                    <a href="https://t.me/buy_toys_bot" class="saving-button" target="_blank">Хочу по акции</a>
+                </div>
+                <!-- Кукла говорящая -->
+                <div class="saving-card">
+                    <div class="saving-badge">🔥 -44%</div>
+                    <div class="saving-icon">🧸</div>
+                    <div class="saving-title">Кукла говорящая</div>
+                    <div class="saving-compare">
+                        <span class="old-price">899 ₽ <span>Wildberries</span></span>
+                        <div class="new-price">499 ₽</div>
+                    </div>
+                    <a href="https://t.me/buy_toys_bot" class="saving-button" target="_blank">Хочу по акции</a>
+                </div>
+                <!-- Комбо антистресс -->
+                <div class="saving-card">
+                    <div class="saving-badge">🔥 -58%</div>
+                    <div class="saving-icon">🎁</div>
+                    <div class="saving-title">Комбо антистресс</div>
+                    <div class="saving-compare">
+                        <span class="old-price">1200 ₽ <span>Wildberries</span></span>
+                        <div class="new-price">499 ₽</div>
+                    </div>
+                    <a href="https://t.me/buy_toys_bot" class="saving-button" target="_blank">Хочу по акции</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Товары (с указанием старых цен и скидок) -->
         <section class="products">
             <h2 class="section-title">Наши игрушки</h2>
             <div class="products-grid">
                 <div class="product-card">
+                    <div class="product-badge">-44%</div>
                     <div class="product-image">🧸</div>
                     <div class="product-info">
                         <div class="product-name">Кукла говорящая</div>
-                        <div class="product-price">499 ₽</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">899 ₽</span>
+                            <span class="product-price">499 ₽</span>
+                        </div>
                         <div class="product-desc">Новая, есть кнопка, разговаривает</div>
                         <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
                     </div>
                 </div>
                 <div class="product-card">
+                    <div class="product-badge">-60%</div>
                     <div class="product-image">🐻</div>
                     <div class="product-info">
                         <div class="product-name">Розовый стич</div>
-                        <div class="product-price">199 ₽</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">500 ₽</span>
+                            <span class="product-price">199 ₽</span>
+                        </div>
                         <div class="product-desc">С подвеской, новый</div>
                         <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
                     </div>
                 </div>
                 <div class="product-card">
+                    <div class="product-badge">-38%</div>
                     <div class="product-image">🐰</div>
                     <div class="product-info">
                         <div class="product-name">Кисмиси розовая</div>
-                        <div class="product-price">249 ₽</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">400 ₽</span>
+                            <span class="product-price">249 ₽</span>
+                        </div>
                         <div class="product-desc">С ручками-липучками</div>
                         <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
                     </div>
                 </div>
                 <div class="product-card">
+                    <div class="product-badge">-50%</div>
                     <div class="product-image">🐶</div>
                     <div class="product-info">
                         <div class="product-name">Собака белая</div>
-                        <div class="product-price">199 ₽</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">400 ₽</span>
+                            <span class="product-price">199 ₽</span>
+                        </div>
                         <div class="product-desc">Мягкая игрушка</div>
                         <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
                     </div>
                 </div>
                 <div class="product-card">
+                    <div class="product-badge">-58%</div>
                     <div class="product-image">🎁</div>
                     <div class="product-info">
                         <div class="product-name">Комбо антистресс</div>
-                        <div class="product-price">499 ₽</div>
+                        <div class="product-price-block">
+                            <span class="product-old-price">1200 ₽</span>
+                            <span class="product-price">499 ₽</span>
+                        </div>
                         <div class="product-desc">Набор из 5 антистресс игрушек</div>
                         <a href="https://t.me/buy_toys_bot" class="product-button" target="_blank">Купить в боте</a>
                     </div>
@@ -745,7 +943,7 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.category-card, .product-card, .feature-item, .step').forEach(el => {
+        document.querySelectorAll('.category-card, .product-card, .feature-item, .step, .saving-card').forEach(el => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(20px)';
             el.style.transition = 'opacity 0.6s, transform 0.6s';
