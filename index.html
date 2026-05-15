@@ -477,7 +477,10 @@
             padding: 4px 8px; border-radius: 20px; transition: all 0.2s;
         }
         .notification-header button:hover { background: rgba(255,255,255,0.2); }
-        .notification-list { max-height: 400px; overflow-y: auto; }
+        .notification-list {
+            overflow-y: auto;         /* скроллится только список уведомлений */
+            max-height: calc(80vh - 60px); /* подбери под свой хедер */
+            }
         .notification-item {
             padding: 12px 15px; border-bottom: 1px solid #f0f0f0; font-size: 13px;
         }
@@ -649,7 +652,20 @@
             .cart-item-info { justify-content: space-between; }
             .cart-summary { flex-direction: column; text-align: center; }
             .modal-buttons { flex-direction: column; }
-            .notification-center { width: 280px; right: 10px; top: 70px; }
+            .notification-center {
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                width: 320px;
+                max-height: 80vh;         /* чтобы не вылезало за экран */
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                z-index: 1001;
+                display: none;
+                flex-direction: column;
+                overflow: hidden;         /* скрывает лишнее */
+                }
             .order-card-header { flex-direction: column; align-items: flex-start; }
             .reviews-header { flex-direction: column; text-align: center; }
             .average-rating { justify-content: center; }
