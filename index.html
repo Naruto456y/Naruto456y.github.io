@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="color-scheme" content="light">
+    <title>🧸 Игрушки в ЖК Дубровка</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/libphonenumber-js/1.11.12/libphonenumber-js.min.js"></script>
+    <style> 
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        :root { color-scheme: light; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .network-banner {
+            display: none;
+            background-color: #ff6b6b;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .network-banner.show { display: block; }
+
+        .header {
+            background: white;
+            border-radius: 30px;
+            padding: 15px 25px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-icon {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 28px;
+            transition: transform 0.3s;
+        }
+        .logo-icon:hover { transform: rotate(5deg) scale(1.1); }
+        .logo-text h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text; -webkit-background-clip: text;
+            color: transparent;
+        }
+        .logo-text p { color: #666; font-size: 14px; }
+        .header-buttons { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .header-btn {
+            cursor: pointer; padding: 8px 16px; background: #f0f0f0; border-radius: 50px;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+            font-weight: 600; font-size: 14px; border: none; position: relative;
+        }
+        .header-btn:hover { background: #e0e0e0; transform: scale(1.05); }
+        .cart-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .cart-count {
+            background: #ff6b6b; color: white; font-size: 12px; font-weight: bold;
+            padding: 2px 6px; border-radius: 20px; min-width: 22px; text-align: center;
+        }
+        .cart-total { font-weight: 600; margin-left: 5px; }
+        .notification-bell { background: #ff9800; color: white; position: relative; }
+        .notification-badge {
+            position: absolute; top: -5px; right: -5px; background: #ff6b6b;
+            color: white; font-size: 10px; border-radius: 50%; width: 18px; height: 18px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        /* Блок помощи */
+        .help-block {
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .help-block.show { display: block; }
+        .help-block h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .help-block ul {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+        .help-block li { margin-bottom: 8px; }
+        .help-block .btn-chat-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .stats-bar {
+            background: white; border-radius: 30px; padding: 20px 25px; margin-bottom: 20px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease-out 0.1s both;
+        }
+        .stat-item {
+            display: flex; align-items: center; gap: 12px; background: #f8f0ff;
+            padding: 10px 15px; border-radius: 50px; transition: transform 0.3s;
+        }
+        .stat-item:hover { transform: translateY(-3px); }
+        .stat-icon { font-size: 24px; }
+        .stat-info h4 { font-size: 11px; color: #666; }
+        .stat-info p { font-size: 18px; font-weight: 700; color: #667eea; }
+        
+        .categories { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+        .category-btn {
+            padding: 12px 25px; border: none; border-radius: 50px; background: white;
+            font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px;
+        }
+        .category-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; transform: translateY(-2px); }
+        .category-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(102,126,234,0.2); }
+        
+        .search-section { background: white; border-radius: 30px; padding: 20px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .search-box { position: relative; }
+        .search-box input {
+            width: 100%; padding: 15px 50px 15px 20px; border: 2px solid #f0f0f0; border-radius: 50px;
+            font-size: 16px; transition: all 0.3s; background: #f9f9f9;
+        }
+        .search-box input:focus { border-color: #667eea; outline: none; background: white; }
+        .search-box span { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 24px; color: #999; }
+        
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .product-card {
+            background: white; border-radius: 30px; overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.2,0.9,0.4,1.1);
+            animation: cardFadeIn 0.5s ease-out;
+        }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .product-card:hover { transform: translateY(-12px) scale(1.02); box-shadow: 0 30px 50px rgba(102,126,234,0.3); }
+        .product-gallery {
+            position: relative; height: 280px; background: linear-gradient(145deg, #f8f0ff 0%, #efe6ff 100%);
+            overflow: hidden; touch-action: pan-y pinch-zoom;
+        }
+        .gallery-container { display: flex; height: 100%; transition: transform 0.4s ease-out; }
+        .gallery-slide { flex: 0 0 100%; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .gallery-slide img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s; }
+        .product-card:hover .gallery-slide img { transform: scale(1.05); }
+        .gallery-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%); width: 32px; height: 32px;
+            background: white; border: none; border-radius: 50%; cursor: pointer; opacity: 0;
+            transition: all 0.3s; z-index: 2; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .product-card:hover .gallery-arrow { opacity: 0.9; }
+        .gallery-arrow:hover { opacity: 1; background: #667eea; color: white; transform: translateY(-50%) scale(1.1); }
+        .gallery-arrow.left { left: 12px; }
+        .gallery-arrow.right { right: 12px; }
+        .gallery-nav { position: absolute; bottom: 15px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; z-index: 2; }
+        .gallery-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,0.3); cursor: pointer; transition: all 0.2s; }
+        .gallery-dot.active { background: #667eea; transform: scale(1.3); }
+        .product-info { padding: 25px; }
+        .product-name { font-size: 20px; font-weight: 700; margin-bottom: 10px; transition: color 0.2s; }
+        .product-card:hover .product-name { color: #667eea; }
+        .product-description { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 15px; min-height: 60px; }
+        .product-price {
+            font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text; -webkit-background-clip: text; color: transparent; margin-bottom: 20px;
+        }
+        .product-actions { display: flex; gap: 10px; }
+        .add-to-cart-btn, .remove-from-cart-btn {
+            flex: 1; padding: 12px; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .add-to-cart-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .add-to-cart-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+        .remove-from-cart-btn { background: #ff6b6b; color: white; }
+        .remove-from-cart-btn:hover { transform: translateY(-2px); background: #ff5252; }
+        
+        /* Анимация корзины */
+        .cart-btn.pop { animation: cartPop 0.4s ease; }
+        @keyframes cartPop {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        
+        .cart-section {
+            background: white; border-radius: 30px; padding: 25px; margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .cart-title {
+            font-size: 24px; margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text; -webkit-background-clip: text; color: transparent;
+        }
+        .cart-item {
+            display: flex; align-items: center; justify-content: space-between; padding: 15px;
+            background: #f8f8f8; border-radius: 20px; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;
+            transition: all 0.2s;
+        }
+        .cart-item:hover { background: #f0f0f0; transform: translateX(5px); }
+        .cart-item-info { display: flex; align-items: center; gap: 20px; flex: 2; flex-wrap: wrap; }
+        .cart-item-name { font-size: 16px; font-weight: 600; }
+        .cart-item-price { color: #667eea; font-weight: 600; }
+        .cart-item-remove {
+            background: #ff6b6b; color: white; border: none; width: 36px; height: 36px;
+            border-radius: 50%; cursor: pointer; font-size: 18px; transition: all 0.2s;
+        }
+        .cart-item-remove:hover { transform: scale(1.1); background: #ff4444; }
+        .cart-summary {
+            margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
+            border-radius: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;
+        }
+        .cart-total-amount {
+            font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text; -webkit-background-clip: text; color: transparent;
+        }
+        .checkout-btn, .clear-cart-btn { padding: 12px 25px; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .checkout-btn { background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; }
+        .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(76,175,80,0.4); }
+        .clear-cart-btn { background: #ff6b6b; color: white; }
+        .clear-cart-btn:hover { transform: translateY(-2px); background: #ff5252; }
+        
+        .orders-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .orders-tab-btn {
+            padding: 10px 20px; background: none; border: none; font-size: 16px; font-weight: 600;
+            cursor: pointer; color: #666; border-radius: 30px; transition: all 0.2s;
+        }
+        .orders-tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .orders-tab-btn:hover:not(.active) { background: #f0f0f0; }
+        .orders-tab-content { display: none; }
+        .orders-tab-content.active { display: block; }
+        .order-card {
+            background: #f8f9fa; border-radius: 20px; padding: 20px; margin-bottom: 15px;
+            border-left: 4px solid #667eea; transition: all 0.2s;
+        }
+        .order-card:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .order-card-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+            gap: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0;
+        }
+        .order-id { font-weight: 700; font-size: 14px; color: #667eea; }
+        .order-date { font-size: 12px; color: #999; }
+        .order-status { padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; }
+        .status-processing { background: #ffd700; color: #333; }
+        .status-confirmed { background: #4caf50; color: white; }
+        .status-courier { background: #2196f3; color: white; }
+        .status-delivered { background: #9c27b0; color: white; }
+        .status-cancelled { background: #ff6b6b; color: white; }
+        .order-items { margin: 15px 0; padding-left: 20px; color: #666; font-size: 14px; }
+        .order-total { font-weight: 700; color: #667eea; margin-top: 10px; }
+        .order-actions { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .order-btn {
+            padding: 6px 14px; border: none; border-radius: 20px; cursor: pointer;
+            font-weight: 600; font-size: 13px; transition: all 0.2s;
+        }
+        .order-btn:hover { transform: translateY(-2px); }
+        .order-btn-complete { background: #9c27b0; color: white; }
+        .order-btn-cancel { background: #ff6b6b; color: white; }
+        .order-btn-delete { background: #ff4444; color: white; }
+        .order-btn-chat { background: #667eea; color: white; }
+        .order-btn-receipt { background: #2196f3; color: white; }
+        .order-btn-receipt:hover { transform: translateY(-2px); background: #1976d2; }
+        
+        .chat-section {
+            background: white; border-radius: 30px; padding: 25px; margin-top: 30px; margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .chat-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+            padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; flex-wrap: wrap; gap: 10px;
+        }
+        .chat-title {
+            font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text; -webkit-background-clip: text; color: transparent;
+        }
+        .chat-subtitle { font-size: 12px; color: #999; background: #f8f9fa; padding: 4px 12px; border-radius: 50px; }
+        .chat-status { font-size: 12px; padding: 4px 12px; border-radius: 50px; background: #4caf50; color: white; }
+        .chat-messages {
+            height: 300px; overflow-y: auto; background: #f8f9fa; border-radius: 20px; padding: 15px; margin-bottom: 15px;
+        }
+        .chat-message { margin-bottom: 15px; display: flex; flex-direction: column; }
+        .chat-message.customer { align-items: flex-end; }
+        .chat-message.admin { align-items: flex-start; }
+        .chat-bubble {
+            max-width: 75%; padding: 12px 16px; border-radius: 18px; word-wrap: break-word; font-size: 14px;
+            position: relative;
+        }
+        .chat-message.customer .chat-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border-bottom-right-radius: 5px;
+        }
+        .chat-message.admin .chat-bubble { 
+            background: #fff3e0; 
+            color: #333; 
+            border-bottom-left-radius: 5px;
+            border: 1px solid #ffe0b2;
+        }
+        .chat-sender {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .chat-message.customer .chat-sender { color: #e3f2fd; }
+        .chat-message.admin .chat-sender { color: #e65100; }
+        .chat-time { font-size: 10px; color: #999; margin-top: 4px; }
+        .chat-image-preview {
+            max-width: 200px; max-height: 150px; border-radius: 12px; margin-top: 8px; cursor: pointer;
+        }
+        .chat-input-area { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .chat-input-area input {
+            flex: 1; padding: 12px 15px; border: 2px solid #f0f0f0; border-radius: 50px;
+            font-size: 14px; transition: all 0.2s;
+        }
+        .chat-input-area input:focus { border-color: #667eea; outline: none; }
+        .chat-image-upload-btn {
+            padding: 10px 15px; background: #f0f0f0; border-radius: 50px; cursor: pointer;
+            font-size: 18px; transition: all 0.2s;
+        }
+        .chat-image-upload-btn:hover { background: #e0e0e0; }
+        .chat-input-area button {
+            padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; border-radius: 50px; cursor: pointer; transition: all 0.2s;
+            font-weight: 600; display: flex; align-items: center; gap: 5px;
+        }
+        .chat-input-area button:disabled {
+            opacity: 0.7; cursor: not-allowed; transform: none !important;
+        }
+        .chat-input-area button:hover { transform: translateY(-2px); }
+        
+        /* Спиннер */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .reviews-section {
+            background: white; border-radius: 30px; padding: 25px; margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .reviews-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;
+        }
+        .reviews-title {
+            font-size: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text; -webkit-background-clip: text; color: transparent;
+        }
+        .average-rating {
+            display: flex; align-items: center; gap: 12px; background: #f8f0ff; padding: 8px 20px; border-radius: 50px;
+        }
+        .average-stars { display: flex; gap: 4px; }
+        .star-filled { color: #ffc107; font-size: 22px; }
+        .star-empty { color: #e0e0e0; font-size: 22px; }
+        .average-number { font-size: 28px; font-weight: 800; color: #667eea; }
+        .reviews-grid {
+            display: flex; flex-direction: column; gap: 20px; max-height: 500px;
+            overflow-y: auto; padding-right: 10px;
+        }
+        .review-card {
+            background: #faf9ff; border-radius: 24px; padding: 20px; border: 1px solid #f0eaff; transition: all 0.3s;
+        }
+        .review-card:hover { transform: translateX(5px); border-color: #667eea; box-shadow: 0 5px 15px rgba(102,126,234,0.1); }
+        .review-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 12px;
+        }
+        .review-name { font-weight: 700; font-size: 16px; }
+        .review-date { font-size: 11px; color: #999; }
+        .review-stars { display: flex; gap: 3px; margin-bottom: 12px; }
+        .review-text { color: #555; line-height: 1.5; font-size: 14px; }
+        .review-actions { margin-top: 12px; display: flex; gap: 10px; }
+        .review-edit-btn, .review-delete-btn {
+            padding: 5px 12px; border: none; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s;
+        }
+        .review-edit-btn { background: #667eea; color: white; }
+        .review-edit-btn:hover { transform: translateY(-2px); background: #5a6fd6; }
+        .review-delete-btn { background: #ff6b6b; color: white; }
+        .review-delete-btn:hover { transform: translateY(-2px); background: #ff5252; }
+        .no-reviews { text-align: center; padding: 50px; color: #999; }
+        .write-review-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+            border: none; padding: 12px 28px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .write-review-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(102,126,234,0.3); }
+        
+        .star-rating {
+            display: flex; gap: 10px; flex-direction: row-reverse; justify-content: flex-end;
+        }
+        .star-rating input { display: none; }
+        .star-rating label { font-size: 32px; color: #ddd; cursor: pointer; transition: color 0.2s; }
+        .star-rating label:hover, .star-rating label:hover~label, .star-rating input:checked~label { color: #ffc107; }
+        
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white; border-radius: 30px; padding: 25px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 10px 12px; border: 2px solid #f0f0f0; border-radius: 15px; font-size: 15px;
+        }
+        .radio-group { display: flex; gap: 20px; margin-top: 5px; flex-wrap: wrap; }
+        .radio-group label { display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer; }
+        .pickup-address {
+            background: #e8f5e9; padding: 10px 15px; border-radius: 15px; margin: 10px 0;
+            font-size: 14px; color: #2e7d32; border-left: 3px solid #4caf50;
+            display: none;
+        }
+        .pickup-address.show { display: block; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-buttons { display: flex; gap: 15px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .modal-buttons button:hover { transform: translateY(-2px); }
+        .submit-btn { background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; }
+        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; }
+        .cancel-btn { background: #f0f0f0; color: #333; }
+        
+        .notification-center {
+            position: fixed; top: 80px; right: 20px; width: 320px; background: white;
+            border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 1001;
+            display: none; flex-direction: column; overflow: hidden;
+        }
+        .notification-center.active { display: flex; }
+        .notification-header {
+            display: flex; justify-content: space-between; align-items: center; padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+        }
+        .notification-header h3 { font-size: 16px; }
+        .notification-header button {
+            background: none; border: none; color: white; cursor: pointer; font-size: 12px;
+            padding: 4px 8px; border-radius: 20px; transition: all 0.2s;
+        }
+        .notification-header button:hover { background: rgba(255,255,255,0.2); }
+        .notification-list { max-height: 400px; overflow-y: auto; }
+        .notification-item {
+            padding: 12px 15px; border-bottom: 1px solid #f0f0f0; font-size: 13px;
+        }
+        .notification-item.success { border-left: 3px solid #4caf50; }
+        .notification-item.error { border-left: 3px solid #ff6b6b; }
+        .notification-item.info { border-left: 3px solid #667eea; }
+        .notification-time { font-size: 10px; color: #999; margin-top: 5px; }
+        .clear-notifications-btn {
+            padding: 8px; text-align: center; background: #f8f9fa; cursor: pointer;
+            color: #667eea; font-weight: 600; font-size: 12px; border-top: 1px solid #f0f0f0;
+        }
+        .clear-notifications-btn:hover { background: #f0f0f0; }
+        
+        .toast-notification {
+            position: fixed; bottom: 20px; right: 20px; background: white; border-radius: 15px;
+            padding: 12px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideIn 0.3s ease;
+            z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%;
+        }
+        .toast-notification.success { border-left: 4px solid #4caf50; }
+        .toast-notification.error { border-left: 4px solid #ff6b6b; }
+        .toast-notification.info { border-left: 4px solid #667eea; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .receipt-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .receipt-modal.active { display: flex; }
+        .receipt-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px dashed #ccc;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .receipt-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .receipt-order-id {
+            font-size: 12px;
+            color: #999;
+        }
+        .receipt-items {
+            margin: 15px 0;
+        }
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dotted #eee;
+            font-size: 13px;
+        }
+        .receipt-item-name { flex: 1; }
+        .receipt-item-qty { color: #666; margin: 0 10px; }
+        .receipt-item-price { font-weight: 600; color: #667eea; }
+        .receipt-total {
+            border-top: 2px dashed #ccc;
+            padding-top: 15px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: 800;
+            color: #4caf50;
+        }
+        .receipt-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .receipt-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .footer {
+            background: white; border-radius: 30px; padding: 20px; text-align: center;
+            color: #666; font-size: 12px; margin-top: 30px;
+        }
+        
+        .support-block {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 14px;
+            text-align: left;
+        }
+        .support-block h4 {
+            margin-bottom: 12px;
+            color: #667eea;
+            font-size: 16px;
+        }
+        .support-block p {
+            margin: 8px 0;
+            color: #555;
+        }
+        .support-block a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .support-block a:hover {
+            text-decoration: underline;
+        }
+        .faq-item {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 15px;
+            border: 1px solid #e0e0e0;
+        }
+        .faq-item summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #333;
+        }
+        .faq-item ul {
+            margin-top: 10px;
+            padding-left: 20px;
+            color: #666;
+            font-size: 13px;
+        }
+        .faq-item li {
+            margin: 5px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .header { padding: 12px; flex-direction: column; text-align: center; }
+            .logo-icon { width: 40px; height: 40px; font-size: 22px; }
+            .logo-text h1 { font-size: 18px; }
+            .header-buttons { justify-content: center; }
+            .header-btn { padding: 6px 12px; font-size: 12px; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .products-grid { grid-template-columns: 1fr; gap: 20px; }
+            .product-gallery { height: 250px; }
+            .gallery-arrow { opacity: 0.8; width: 28px; height: 28px; }
+            .cart-item { flex-direction: column; align-items: stretch; }
+            .cart-item-info { justify-content: space-between; }
+            .cart-summary { flex-direction: column; text-align: center; }
+            .modal-buttons { flex-direction: column; }
+            .notification-center { width: 280px; right: 10px; top: 70px; }
+            .order-card-header { flex-direction: column; align-items: flex-start; }
+            .reviews-header { flex-direction: column; text-align: center; }
+            .average-rating { justify-content: center; }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .radio-group label {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px 15px;
+                background: #f8f9fa;
+                border-radius: 15px;
+                cursor: pointer;
+                min-height: 44px;
+            }
+            .radio-group input[type="radio"] {
+                width: 20px;
+                height: 20px;
+                accent-color: #667eea;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="networkBanner" class="network-banner">❌ Нет подключения к интернету. Сайт может работать некорректно.</div>
+
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🧸</div>
+                <div class="logo-text">
+                    <h1>ЖК Дубровка</h1>
+                    <p>Магазин игрушек</p>
+                </div>
+            </div>
+            <div class="header-buttons">
+                <button class="header-btn cart-btn" onclick="scrollToCart()">
+                    🛒 Корзина <span class="cart-count" id="cartCount">0</span>
+                    <span class="cart-total" id="cartTotal">0 ₽</span>
+                </button>
+                <button class="header-btn" onclick="scrollToProducts()">📦 Товары</button>
+                <button class="header-btn" onclick="scrollToOrders()">📦 Мои заказы</button>
+                <button class="header-btn" id="chatHeaderBtn" style="display: none;" onclick="scrollToChat()">💬 Чат</button>
+                <button class="header-btn" onclick="scrollToReviews()">⭐ Отзывы</button>
+                <button class="header-btn" onclick="toggleHelpBlock()">❓ Помощь</button>
+                <button class="header-btn notification-bell" id="notificationBell" onclick="toggleNotificationCenter()">
+                    🔔 <span id="notificationCount" class="notification-badge" style="display: none;">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Блок помощи -->
+        <div id="helpBlock" class="help-block">
+            <h3>📖 Как пользоваться магазином</h3>
+            <ul>
+                <li><strong>🛒 Корзина</strong> — добавляйте товары и оформляйте заказ.</li>
+                <li><strong>📦 Мои заказы</strong> — отслеживайте статус заказа и общайтесь в чате.</li>
+                <li><strong>💬 Чат</strong> — доступен после оформления заказа. Задавайте вопросы администратору.</li>
+                <li><strong>⭐ Отзывы</strong> — оставьте отзыв после получения заказа.</li>
+                <li><strong>🔔 Уведомления</strong> — важные события и ответы администратора.</li>
+            </ul>
+            <div id="helpChatLink"></div>
+        </div>
+
+        <div class="stats-bar" id="statsBar"></div>
+        <div class="categories" id="categories"></div>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Поиск по названию или описанию..." oninput="searchProducts()">
+                <span>🔍</span>
+            </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid"></div>
+
+        <div class="cart-section" id="cartSection">
+            <h2 class="cart-title">🛒 Ваша корзина</h2>
+            <div id="cartItems"></div>
+            <div class="cart-summary">
+                <span class="cart-total-amount" id="cartTotalAmount">0 ₽</span>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="clear-cart-btn" onclick="clearCart()">🗑 Очистить</button>
+                    <button class="checkout-btn" onclick="openCheckoutModal()">✅ Оформить заказ</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="ordersSection" style="display: none;">
+            <div class="cart-section">
+                <h2 class="cart-title">📦 Мои заказы</h2>
+                <div class="orders-tabs">
+                    <button class="orders-tab-btn active" onclick="switchOrdersTab('active')">Активные</button>
+                    <button class="orders-tab-btn" onclick="switchOrdersTab('history')">История</button>
+                </div>
+                <div id="activeOrdersTab" class="orders-tab-content active"></div>
+                <div id="historyOrdersTab" class="orders-tab-content"></div>
+            </div>
+        </div>
+
+        <div id="chatSection" class="chat-section" style="display: none;">
+            <div class="chat-header">
+                <div>
+                    <span class="chat-title">💬 Чат с администратором</span>
+                    <div class="chat-subtitle" id="chatOrderInfo"></div>
+                </div>
+                <span class="chat-status" id="chatStatus">🟢 Онлайн</span>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Введите сообщение...">
+                <span class="chat-image-upload-btn" onclick="document.getElementById('chatImageInput').click()">📎</span>
+                <input type="file" id="chatImageInput" accept="image/*" style="display:none" onchange="handleChatImageUpload(this)">
+                <button onclick="sendMessage()" id="sendChatBtn">📤 Отправить</button>
+            </div>
+            <div id="chatImagePreviewContainer" style="margin-top:10px; display:none;">
+                <img id="chatImagePreview" style="max-width:150px; max-height:100px; border-radius:10px;">
+                <button onclick="clearChatImage()" style="margin-left:10px; background:#ff6b6b; color:white; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer;">✖️</button>
+            </div>
+        </div>
+
+        <div class="reviews-section" id="reviewsSection">
+            <div class="reviews-header">
+                <div class="reviews-title">⭐ Отзывы наших покупателей</div>
+                <button class="write-review-btn" onclick="openReviewModal()">✍️ Написать отзыв</button>
+            </div>
+            <div id="reviewsList" class="reviews-grid"></div>
+        </div>
+
+        <footer class="footer" id="supportBlock">
+            <p>🧸 Игрушки в ЖК Дубровка | 💵 Оплата только наличными</p>
+            
+            <div class="support-block">
+                <h4>🛠️ Помощь и поддержка</h4>
+                <p><strong>Телефон:</strong> <a href="tel:+79670581001">+7 (967) 058-10-01</a></p>
+                <p><strong>Почта:</strong> <a href="mailto:toys_in_dubrovka@mail.ru">toys_in_dubrovka@mail.ru</a></p>
+                <p><strong>Режим работы:</strong> Пн-Пт 16:00–21:00 / Сб-Вс 10:00–21:00</p>
+                <details class="faq-item">
+                    <summary>❓ Частые вопросы</summary>
+                    <ul>
+                        <li><strong>Как оформить заказ?</strong> — Добавьте товары в корзину и нажмите «Оформить заказ».</li>
+                        <li><strong>Какая оплата?</strong> — Только наличными при получении.</li>
+                        <li><strong>Есть ли доставка?</strong> — Да, по ЖК Дубровка и соседним районам. Уточняется при оформлении, в чате или по телефону.</li>
+                        <li><strong>Можно ли вернуть товар?</strong> — Да, в течение 14 дней при сохранении чека.</li>
+                        <li><strong>Где найти чек?</strong> — В разделе «📦 Мои заказы» найдите свой заказ и нажмите кнопку «🧾 Чек».</li>
+                        <li><strong>Как придёт заказ?</strong> — Если доставка курьером: курьер принесёт заказ в рюкзаке с пакетом. Если самовывоз: мы сообщим о готовности по телефону или в чате, заказ выдаётся при предъявлении чека.</li>
+                    </ul>
+                </details>
+            </div>
+        </footer>
+    </div>
+
+    <div id="notificationCenter" class="notification-center">
+        <div class="notification-header">
+            <h3>📢 Уведомления</h3>
+            <button onclick="toggleNotificationCenter()">✕</button>
+        </div>
+        <div id="notificationList" class="notification-list"></div>
+        <div class="clear-notifications-btn" onclick="clearAllNotifications()">🗑 Очистить все уведомления</div>
+    </div>
+
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content">
+            <h2>Оформление заказа</h2>
+            <form id="orderForm">
+                <div class="form-group"><label>Ваше имя *</label><input type="text" id="name" required></div>
+                <div class="form-group"><label>Номер телефона *</label><input type="tel" id="phone" required placeholder="+7 (967) 058-10-01"></div>
+                <div class="form-group">
+                    <label>Способ получения *</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="delivery" value="pickup" checked> 🚶 Самовывоз</label>
+                        <label><input type="radio" name="delivery" value="courier"> 🚚 Доставка</label>
+                    </div>
+                </div>
+                <div class="form-group" id="addressGroup" style="display: none;">
+                    <label>Адрес доставки *</label><input type="text" id="address" placeholder="ул. Ленина, д. 10, кв. 5" required>
+                </div>
+                <div class="form-group">
+                    <label>Комментарий</label><textarea id="comment" rows="2" placeholder="Пожелания, этаж, домофон..."></textarea>
+                </div>
+                <div id="pickupAddressInfo" class="pickup-address">
+                    📍 Адрес самовывоза: ЖК Дубровка, Ясеневая улица, 1к1
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="cancel-btn" onclick="closeCheckoutModal()">Отмена</button>
+                    <button type="submit" class="submit-btn">✅ Оформить заказ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <h2 id="reviewModalTitle">Ваш отзыв</h2>
+            <form id="reviewForm">
+                <div class="form-group"><label>Ваше имя *</label><input type="text" id="reviewName" required></div>
+                <div class="form-group"><label>Оценка *</label>
+                    <div class="star-rating">
+                        <input type="radio" name="rating" value="5" id="star5"><label for="star5">★</label>
+                        <input type="radio" name="rating" value="4" id="star4"><label for="star4">★</label>
+                        <input type="radio" name="rating" value="3" id="star3"><label for="star3">★</label>
+                        <input type="radio" name="rating" value="2" id="star2"><label for="star2">★</label>
+                        <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
+                    </div>
+                </div>
+                <div class="form-group"><label>Ваш отзыв *</label><textarea id="reviewText" rows="4" required placeholder="Поделитесь впечатлениями..."></textarea></div>
+                <div class="modal-buttons">
+                    <button type="button" class="cancel-btn" onclick="closeReviewModal()">Отмена</button>
+                    <button type="submit" class="submit-btn" id="reviewSubmitBtn">📝 Отправить отзыв</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="receipt-modal" id="receiptModal"></div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        (function() { emailjs.init("1mOqt9SpCR07RqlYG"); })();
+        const EMAILJS_CONFIG = { serviceId: "service_z3hjq3i", adminTemplateId: "template_qp4fr3c" };
+
+        const PRODUCTS_URL = "https://naruto456y.github.io/data.json";
+        const ORDERS_API_URL = "https://69c3e454b780a9ba03e8426f.mockapi.io/api/v1/orders";
+        const REVIEWS_API_URL = "https://69c3e454b780a9ba03e8426f.mockapi.io/api/v1/reviews";
+        
+        let allProducts = [], categories = [], cart = JSON.parse(localStorage.getItem("cart")) || [], orders = [];
+        let currentOrderId = null, currentCategory = "all", searchQuery = "";
+        let reviews = [];
+        let editingReviewId = null;
+        let currentUserId = localStorage.getItem("currentUserId") || "";
+        let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+        let notificationsRead = false;
+        let orderInProgress = false;
+        let pendingChatImage = null;
+        let sendingMessage = false;
+
+        // ========== УВЕДОМЛЕНИЯ ==========
+        function formatTimeAgo(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMins = Math.floor((now - date) / 60000);
+            if (diffMins < 1) return "только что";
+            if (diffMins < 60) return `${diffMins} мин назад`;
+            if (diffMins < 1440) return `${Math.floor(diffMins / 60)} ч назад`;
+            return `${Math.floor(diffMins / 1440)} д назад`;
+        }
+
+        function clearOldNotifications() {
+            const oneHourAgo = Date.now() - 3600000;
+            notifications = notifications.filter(n => new Date(n.time).getTime() > oneHourAgo);
+            localStorage.setItem("notifications", JSON.stringify(notifications));
+            renderNotificationCenter();
+        }
+
+        function clearAllNotifications() {
+            notifications = [];
+            localStorage.setItem("notifications", JSON.stringify(notifications));
+            renderNotificationCenter();
+            updateNotificationBadge();
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById("notificationCount");
+            if (!notificationsRead && notifications.length > 0) {
+                badge.textContent = notifications.length;
+                badge.style.display = "flex";
+            } else {
+                badge.style.display = "none";
+            }
+        }
+        
+        function renderNotificationCenter() {
+            const container = document.getElementById("notificationList");
+            if (!container) return;
+            if (notifications.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">Нет уведомлений</div>';
+                return;
+            }
+            container.innerHTML = notifications.slice().reverse().map(n => `
+                <div class="notification-item ${n.type}">
+                    <div>${n.message}</div>
+                    <div class="notification-time">${formatTimeAgo(n.time)}</div>
+                </div>
+            `).join("");
+            updateNotificationBadge();
+        }
+        
+        function addNotification(message, type = "info") {
+            const notification = { id: Date.now(), message, type, time: new Date().toISOString() };
+            notifications.push(notification);
+            if (notifications.length > 50) notifications.shift();
+            localStorage.setItem("notifications", JSON.stringify(notifications));
+            notificationsRead = false;
+            renderNotificationCenter();
+            const toast = document.createElement("div");
+            toast.className = `toast-notification ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+        
+        function toggleNotificationCenter() {
+            const center = document.getElementById("notificationCenter");
+            center.classList.toggle("active");
+            if (center.classList.contains("active")) {
+                notificationsRead = true;
+                updateNotificationBadge();
+            }
+        }
+        
+        setInterval(() => clearOldNotifications(), 60000);
+
+        // ========== БЛОК ПОМОЩИ ==========
+        function toggleHelpBlock() {
+            const helpBlock = document.getElementById("helpBlock");
+            helpBlock.classList.toggle("show");
+            updateHelpChatLink();
+        }
+        
+        function updateHelpChatLink() {
+            const linkContainer = document.getElementById("helpChatLink");
+            const activeOrder = orders.find(o => !["delivered", "cancelled"].includes(o.status));
+            if (activeOrder) {
+                linkContainer.innerHTML = `<div class="btn-chat-link" onclick="openChatForOrder(${activeOrder.id}); toggleHelpBlock()">💬 Перейти в чат (Заказ #${activeOrder.id})</div>`;
+            } else {
+                linkContainer.innerHTML = `<div class="btn-chat-link" onclick="scrollToProducts(); toggleHelpBlock()">🛒 Оформить заказ и начать чат</div>`;
+            }
+        }
+
+        // ========== СБОР ДАННЫХ О ПОЛЬЗОВАТЕЛЕ ==========
+        async function collectUserData() {
+            let userId = localStorage.getItem("userId");
+            if (!userId) {
+                userId = "user_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem("userId", userId);
+            }
+            
+            const ua = navigator.userAgent;
+            let browser = "неизвестно", browserVersion = "", os = "неизвестно", device = "💻 Компьютер";
+            
+            if (ua.includes("Chrome") && !ua.includes("Edg")) { browser = "Chrome"; browserVersion = ua.match(/Chrome\/([0-9.]+)/)?.[1] || ""; }
+            else if (ua.includes("Firefox")) { browser = "Firefox"; browserVersion = ua.match(/Firefox\/([0-9.]+)/)?.[1] || ""; }
+            else if (ua.includes("Safari") && !ua.includes("Chrome")) { browser = "Safari"; browserVersion = ua.match(/Version\/([0-9.]+)/)?.[1] || ""; }
+            else if (ua.includes("Edg")) { browser = "Edge"; browserVersion = ua.match(/Edg\/([0-9.]+)/)?.[1] || ""; }
+            
+            if (ua.includes("Windows")) os = "Windows";
+            else if (ua.includes("Mac OS")) os = "macOS";
+            else if (ua.includes("Linux")) os = "Linux";
+            else if (ua.includes("Android")) os = "Android";
+            else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+            
+            if (ua.includes("Mobile")) device = "📱 Мобильный";
+            else if (ua.includes("Tablet")) device = "📟 Планшет";
+            
+            const screen = `${window.screen.width}x${window.screen.height}`;
+            const language = navigator.language || "ru-RU";
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const timezoneOffset = -new Date().getTimezoneOffset() / 60;
+            
+            let ip = "неизвестно", city = "неизвестно", country = "неизвестно";
+            try {
+                const ipRes = await fetch("https://api.ipify.org?format=json");
+                const ipData = await ipRes.json();
+                ip = ipData.ip;
+                const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+                const geoData = await geoRes.json();
+                if (geoData.city) city = geoData.city;
+                if (geoData.country_name) country = geoData.country_name;
+            } catch(e) {}
+            
+            const referrer = document.referrer;
+            let source = "прямой";
+            if (referrer.includes("google")) source = "Google";
+            else if (referrer.includes("yandex")) source = "Яндекс";
+            else if (referrer.includes("telegram")) source = "Telegram";
+            else if (referrer.includes("vk")) source = "ВКонтакте";
+            else if (referrer) source = referrer;
+            
+            let viewedProducts = JSON.parse(localStorage.getItem("viewedProducts") || "[]");
+            viewedProducts = viewedProducts.slice(-10);
+            
+            let users = JSON.parse(localStorage.getItem("users_tracking") || "[]");
+            const existingIndex = users.findIndex(u => u.id === userId);
+            
+            if (existingIndex !== -1) {
+                users[existingIndex].lastVisit = new Date().toLocaleString();
+                users[existingIndex].visits++;
+                users[existingIndex].source = source;
+                users[existingIndex].viewedProducts = viewedProducts;
+                if (users[existingIndex].ip === "неизвестно" && ip !== "неизвестно") {
+                    users[existingIndex].ip = ip;
+                    users[existingIndex].city = city;
+                    users[existingIndex].country = country;
+                }
+            } else {
+                users.push({
+                    id: userId, ip, city, country, browser, browserVersion, os, device, screen, language,
+                    timezone, timezoneOffset, firstVisit: new Date().toLocaleString(), lastVisit: new Date().toLocaleString(),
+                    visits: 1, orders: 0, source, name: "", email: "", phone: "", viewedProducts: viewedProducts
+                });
+            }
+            localStorage.setItem("users_tracking", JSON.stringify(users));
+        }
+        
+        window.trackProductView = function(productId, productName) {
+            let viewed = JSON.parse(localStorage.getItem("viewedProducts") || "[]");
+            viewed = viewed.filter(p => p.id !== productId);
+            viewed.unshift({ id: productId, name: productName, time: new Date().toLocaleString() });
+            if (viewed.length > 10) viewed.pop();
+            localStorage.setItem("viewedProducts", JSON.stringify(viewed));
+        };
+        
+        window.updateUserOrders = function(userEmail, userName, userPhone) {
+            let users = JSON.parse(localStorage.getItem("users_tracking") || "[]");
+            const userId = localStorage.getItem("userId");
+            if (userId) {
+                const index = users.findIndex(u => u.id === userId);
+                if (index !== -1) {
+                    users[index].orders = (users[index].orders || 0) + 1;
+                    users[index].name = userName;
+                    users[index].email = userEmail;
+                    users[index].phone = userPhone;
+                    localStorage.setItem("users_tracking", JSON.stringify(users));
+                }
+            }
+        };
+        
+        collectUserData();
+
+        // ========== МАСКА ТЕЛЕФОНА И ВАЛИДАЦИЯ ==========
+        function formatPhone(value) {
+            let digits = value.replace(/\D/g, '');
+            if (digits.startsWith('8')) digits = '7' + digits.slice(1);
+            if (!digits.startsWith('7')) digits = '7' + digits;
+            digits = digits.slice(0, 11);
+            let formatted = '+7';
+            if (digits.length > 1) formatted += ' (' + digits.slice(1, 4);
+            if (digits.length >= 5) formatted += ') ' + digits.slice(4, 7);
+            if (digits.length >= 8) formatted += '-' + digits.slice(7, 9);
+            if (digits.length >= 10) formatted += '-' + digits.slice(9, 11);
+            return formatted;
+        }
+        
+        function isValidPhone(value) {
+            try {
+                if (typeof libphonenumber !== 'undefined') {
+                    const phoneNumber = libphonenumber.parsePhoneNumberFromString(value, 'RU');
+                    return phoneNumber ? phoneNumber.isValid() : false;
+                }
+            } catch (e) {}
+            const digits = value.replace(/\D/g, '');
+            return /^7\d{10}$/.test(digits);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    const formatted = formatPhone(e.target.value);
+                    e.target.value = formatted;
+                });
+            }
+            const selected = document.querySelector("input[name='delivery']:checked");
+            if (selected) {
+                const pickupHint = document.getElementById('pickupAddressInfo');
+                if (pickupHint && selected.value === 'pickup') {
+                    pickupHint.classList.add('show');
+                }
+            }
+        });
+
+        // ========== ЗАГРУЗКА ТОВАРОВ ИЗ GITHUB ==========
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${PRODUCTS_URL}?v=${Date.now()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                const data = await response.json();
+                if (!data || !Array.isArray(data.products)) throw new Error('Некорректная структура data.json');
+                categories = data.categories || [];
+                allProducts = data.products || [];
+                console.log(`✅ Товары загружены: ${allProducts.length} шт.`);
+                return true;
+            } catch (error) {
+                console.error('❌ Ошибка загрузки из GitHub:', error);
+                categories = [{ id: "plush", name: "Плюшевые игрушки", icon: "🧸" }];
+                allProducts = [{ id: "demo-1", name: "Демо-товар", price: 199, description: "Тестовый товар", category: "plush", images: [] }];
+                addNotification('❌ Нет интернета. Товары не загружаются. Проверьте подключение', 'error');
+                return false;
+            }
+        }
+
+        async function loadOrders() {
+            try {
+                const response = await fetch(ORDERS_API_URL);
+                if (!response.ok) throw new Error();
+                const records = await response.json();
+                const allOrders = records.map(r => { try { return JSON.parse(r.data); } catch { return null; } }).filter(o => o);
+                const userId = localStorage.getItem("userId");
+                orders = userId ? allOrders.filter(o => o.userId === userId) : [];
+                localStorage.setItem("orders_cache", JSON.stringify(orders));
+            } catch { orders = JSON.parse(localStorage.getItem("orders_cache") || "[]"); }
+        }
+
+        async function loadReviews() {
+            try {
+                const response = await fetch(REVIEWS_API_URL);
+                if (!response.ok) throw new Error();
+                reviews = await response.json();
+                reviews = reviews.map(r => ({ ...r, date: r.createdAt ? new Date(r.createdAt).toLocaleDateString('ru-RU') : new Date().toLocaleDateString('ru-RU') }));
+                localStorage.setItem("reviews_cache", JSON.stringify(reviews));
+            } catch { reviews = JSON.parse(localStorage.getItem("reviews_cache") || "[]"); }
+        }
+
+        async function loadData() {
+            try {
+                await loadProducts();
+                await loadOrders();
+                await loadReviews();
+                renderStatsBar(); renderCategories(); renderProducts(); updateCartDisplay();
+                renderOrdersSection(); checkForActiveChat(); renderReviews();
+                updateHelpChatLink();
+                console.log('✅ Все данные загружены');
+            } catch (error) {
+                console.error('❌ Критическая ошибка загрузки:', error);
+                addNotification('⚠️ Ошибка загрузки данных', 'error');
+            }
+        }
+        
+        function renderStatsBar() {
+            const totalProducts = allProducts.length;
+            let statsHtml = `<div class="stat-item"><div class="stat-icon">📦</div><div class="stat-info"><h4>Всего товаров</h4><p>${totalProducts}</p></div></div>`;
+            categories.forEach(cat => {
+                const count = allProducts.filter(p => p.category === cat.id).length;
+                statsHtml += `<div class="stat-item"><div class="stat-icon">${cat.icon || "📦"}</div><div class="stat-info"><h4>${cat.name}</h4><p>${count}</p></div></div>`;
+            });
+            statsHtml += `<div class="stat-item"><div class="stat-icon">💰</div><div class="stat-info"><h4>Средняя цена</h4><p>${totalProducts ? Math.round(allProducts.reduce((s, p) => s + p.price, 0) / totalProducts) : 0} ₽</p></div></div>`;
+            document.getElementById("statsBar").innerHTML = statsHtml;
+        }
+        
+        function scrollToProducts() { document.getElementById("productsGrid").scrollIntoView({ behavior: "smooth" }); }
+        function scrollToCart() { document.getElementById("cartSection").scrollIntoView({ behavior: "smooth" }); }
+        function scrollToOrders() { const sec = document.getElementById("ordersSection"); if (sec.style.display !== "none") sec.scrollIntoView({ behavior: "smooth" }); else addNotification("Нет активных заказов", "info"); }
+        function scrollToReviews() { document.getElementById("reviewsSection").scrollIntoView({ behavior: "smooth" }); }
+        function scrollToChat() { document.getElementById("chatSection").scrollIntoView({ behavior: "smooth" }); }
+        
+        function renderCategories() {
+            const container = document.getElementById("categories");
+            container.innerHTML = `<button class="category-btn active" onclick="filterByCategory('all')">🏠 Все</button>` + categories.map(cat => `<button class="category-btn" onclick="filterByCategory('${cat.id}')">${cat.icon} ${cat.name}</button>`).join("");
+        }
+        
+        function filterByCategory(categoryId) { currentCategory = categoryId; document.querySelectorAll(".category-btn").forEach(btn => btn.classList.remove("active")); event.target.classList.add("active"); renderProducts(); }
+        function searchProducts() { searchQuery = document.getElementById("searchInput").value.toLowerCase(); renderProducts(); }
+        
+        function renderProducts() {
+            const grid = document.getElementById("productsGrid");
+            let filtered = allProducts.filter(p => (currentCategory === "all" || p.category === currentCategory) && (!searchQuery || p.name.toLowerCase().includes(searchQuery) || (p.description && p.description.toLowerCase().includes(searchQuery))));
+            if (!filtered.length) { grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:100px; background:white; border-radius:30px;'>🔍 Ничего не найдено</div>"; return; }
+            grid.innerHTML = filtered.map(product => `<div class="product-card"><div class="product-gallery"><div class="gallery-container" id="gallery-${product.id}" data-current="0">${(product.images && product.images.length ? product.images : ["placeholder.jpg"]).map(img => `<div class="gallery-slide"><img src="toys/${product.category}/${encodeURIComponent(img)}" alt="${product.name}" onerror="this.src='data:image/svg+xml,%3Csvg%3E%3C/svg%3E'"></div>`).join("")}</div>${(product.images && product.images.length > 1 ? `<button class="gallery-arrow left" onclick="prevImage('${product.id}')">←</button><button class="gallery-arrow right" onclick="nextImage('${product.id}')">→</button><div class="gallery-nav">${product.images.map((_, i) => `<span class="gallery-dot ${i===0?"active":""}" onclick="goToSlide('${product.id}',${i})"></span>`).join("")}</div>` : "")}</div><div class="product-info"><h3 class="product-name">${product.name}</h3><p class="product-description">${product.description || ""}</p><div class="product-price">${product.price} ₽</div><div class="product-actions">${cart.some(item => item.id === product.id) ? `<button class="remove-from-cart-btn" onclick="removeFromCart('${product.id}')">❌ Удалить</button>` : `<button class="add-to-cart-btn" onclick="addToCart('${product.id}')">🛒 В корзину</button>`}</div></div></div>`).join("");
+            filtered.forEach(product => {
+                if (product.images && product.images.length > 1) {
+                    const container = document.getElementById(`gallery-${product.id}`);
+                    if (container) {
+                        let startX = 0, currentTranslate = 0, currentIndex = parseInt(container.dataset.current) || 0;
+                        container.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; currentTranslate = currentIndex * -100; });
+                        container.addEventListener('touchmove', (e) => {
+                            const diff = (e.touches[0].clientX - startX) / container.offsetWidth * 100;
+                            let newTranslate = currentTranslate + diff;
+                            newTranslate = Math.min(0, Math.max(-(product.images.length - 1) * 100, newTranslate));
+                            container.style.transform = `translateX(${newTranslate}%)`;
+                        });
+                        container.addEventListener('touchend', (e) => {
+                            const diff = e.changedTouches[0].clientX - startX;
+                            if (Math.abs(diff) > 30) {
+                                if (diff > 0 && currentIndex > 0) goToSlide(product.id, currentIndex - 1);
+                                else if (diff < 0 && currentIndex < product.images.length - 1) goToSlide(product.id, currentIndex + 1);
+                                else goToSlide(product.id, currentIndex);
+                            } else goToSlide(product.id, currentIndex);
+                        });
+                    }
+                }
+            });
+        }
+        
+        function addToCart(productId) { 
+            const p = allProducts.find(p => p.id === productId); 
+            if (!cart.some(i=>i.id===productId)) { 
+                cart.push({ id: p.id, name: p.name, price: p.price, category: p.category }); 
+                saveCart(); 
+                addNotification(`${p.name} добавлен в корзину`, "success");
+                const cartBtn = document.querySelector('.cart-btn');
+                cartBtn.classList.add('pop');
+                setTimeout(() => cartBtn.classList.remove('pop'), 400);
+            } else addNotification("Уже в корзине", "error"); 
+        }
+        function removeFromCart(productId) { const idx = cart.findIndex(i=>i.id===productId); if(idx!==-1){ const name = cart[idx].name; cart.splice(idx,1); saveCart(); addNotification(`${name} удален из корзины`, "error"); } }
+        function clearCart() { if(cart.length && confirm("Очистить корзину?")){ cart=[]; saveCart(); addNotification("Корзина очищена", "success"); } }
+        function saveCart() { localStorage.setItem("cart",JSON.stringify(cart)); updateCartDisplay(); renderProducts(); }
+        function updateCartDisplay() { 
+            const total = cart.reduce((s,i)=>s+i.price,0); 
+            document.getElementById("cartCount").textContent = cart.length; 
+            document.getElementById("cartTotal").textContent = total+" ₽"; 
+            document.getElementById("cartTotalAmount").textContent = total+" ₽"; 
+            document.getElementById("cartItems").innerHTML = cart.length ? cart.map(item=>`<div class="cart-item"><div class="cart-item-info"><span class="cart-item-name">${item.name}</span><span class="cart-item-price">${item.price} ₽</span></div><button class="cart-item-remove" onclick="removeFromCart('${item.id}')">×</button></div>`).join("") : "<div style='text-align:center; padding:30px; color:#999;'>Корзина пуста</div>"; 
+        }
+        
+        async function saveOrderToAPI(order) {
+            try {
+                const record = { data: JSON.stringify(order), createdAt: new Date().toISOString() };
+                await fetch(ORDERS_API_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(record) });
+                return true;
+            } catch (error) { return false; }
+        }
+        
+        async function updateOrderStatusInAPI(orderId, newStatus) {
+            try {
+                const response = await fetch(ORDERS_API_URL);
+                const records = await response.json();
+                const index = records.findIndex(r => JSON.parse(r.data).id == orderId);
+                if (index !== -1) {
+                    const order = JSON.parse(records[index].data);
+                    order.status = newStatus;
+                    records[index].data = JSON.stringify(order);
+                    await fetch(`${ORDERS_API_URL}/${records[index].id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(records[index]) });
+                    return true;
+                }
+                return false;
+            } catch (error) { return false; }
+        }
+        
+        async function deleteOrderFromAPI(orderId) {
+            try {
+                const response = await fetch(ORDERS_API_URL);
+                const records = await response.json();
+                const index = records.findIndex(r => JSON.parse(r.data).id == orderId);
+                if (index !== -1) { await fetch(`${ORDERS_API_URL}/${records[index].id}`, { method: "DELETE" }); return true; }
+                return false;
+            } catch (error) { return false; }
+        }
+        
+        function renderOrdersSection() {
+            const active = orders.filter(o => !["delivered", "cancelled"].includes(o.status));
+            const history = orders.filter(o => ["delivered", "cancelled"].includes(o.status));
+            const section = document.getElementById("ordersSection");
+            if(active.length === 0 && history.length === 0) { section.style.display = "none"; return; }
+            section.style.display = "block";
+            
+            const statusLabels = {
+                processing: "⏳ Обрабатывается",
+                confirmed: "✅ Подтверждён",
+                courier: "🚚 В пути",
+                delivered: "✅ Доставлен",
+                cancelled: "❌ Отменён"
+            };
+            
+            document.getElementById("activeOrdersTab").innerHTML = active.length ? active.map(order => `
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <span class="order-id">📅 ${order.date}</span>
+                        <span class="order-status status-${order.status}">${statusLabels[order.status] || order.status}</span>
+                    </div>
+                    <div class="order-items">${order.items.map(i=>`${i.name} — ${i.price} ₽<br>`).join("")}</div>
+                    <div class="order-total">💰 Итого: ${order.total} ₽</div>
+                    <div class="order-actions">
+                        ${order.status==="confirmed"||order.status==="courier"?`<button class="order-btn order-btn-complete" onclick="completeOrder(${order.id})">✅ Получить</button>`:""}
+                        ${order.status!=="cancelled" && order.status!=="delivered"?`<button class="order-btn order-btn-cancel" onclick="cancelOrder(${order.id})">❌ Отменить</button>`:""}
+                        <button class="order-btn order-btn-delete" onclick="deleteOrder(${order.id})">🗑 Удалить</button>
+                        <button class="order-btn order-btn-chat" onclick="openChatForOrder(${order.id})">💬 Чат</button>
+                        <button class="order-btn order-btn-receipt" onclick="showReceipt(${order.id})">🧾 Чек</button>
+                    </div>
+                </div>`).join("") : "<div style='text-align:center;padding:30px;color:#999;'>Нет активных заказов</div>";
+            
+            document.getElementById("historyOrdersTab").innerHTML = history.length ? history.map(order => `
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <span class="order-id">📅 ${order.date}</span>
+                        <span class="order-status status-${order.status}">${statusLabels[order.status]}</span>
+                    </div>
+                    <div class="order-items">${order.items.map(i=>`${i.name} — ${i.price} ₽<br>`).join("")}</div>
+                    <div class="order-total">💰 Итого: ${order.total} ₽</div>
+                    <div class="order-actions">
+                        <button class="order-btn order-btn-delete" onclick="deleteOrder(${order.id})">🗑 Удалить</button>
+                        <button class="order-btn order-btn-chat" onclick="openChatForOrder(${order.id})">💬 Чат</button>
+                        <button class="order-btn order-btn-receipt" onclick="showReceipt(${order.id})">🧾 Чек</button>
+                    </div>
+                </div>`).join("") : "<div style='text-align:center;padding:30px;color:#999;'>Нет завершённых заказов</div>";
+        }
+        
+        async function cancelOrder(id) { 
+            const order = orders.find(o=>o.id===id); 
+            if(order && order.status!=="delivered" && order.status!=="cancelled" && confirm("Отменить заказ?")) { 
+                const oldStatus = order.status; order.status = "cancelled"; 
+                const success = await updateOrderStatusInAPI(id, "cancelled");
+                if (success) { localStorage.setItem("orders_cache", JSON.stringify(orders)); renderOrdersSection(); addNotification(`Заказ от ${order.date} отменён`, "error"); } 
+                else { order.status = oldStatus; addNotification("Ошибка отмены заказа", "error"); }
+            } 
+        }
+        
+        async function deleteOrder(id) {
+            if(confirm("Удалить заказ? Это действие нельзя отменить.")) {
+                const order = orders.find(o=>o.id===id);
+                if(order) {
+                    const success = await deleteOrderFromAPI(id);
+                    if (success) { orders = orders.filter(o => o.id !== id); localStorage.setItem("orders_cache", JSON.stringify(orders)); renderOrdersSection(); addNotification(`Заказ от ${order.date} удалён`, "error"); } 
+                    else { addNotification("Ошибка удаления заказа", "error"); }
+                }
+            }
+        }
+        
+        async function completeOrder(id) { 
+            const order = orders.find(o=>o.id===id); 
+            if(order && confirm("Подтвердить получение?")) { 
+                const oldStatus = order.status; order.status = "delivered"; 
+                const success = await updateOrderStatusInAPI(id, "delivered");
+                if (success) { localStorage.setItem("orders_cache", JSON.stringify(orders)); renderOrdersSection(); addNotification(`Заказ от ${order.date} получен! Спасибо!`, "success"); showReviewSuggestion(order); } 
+                else { order.status = oldStatus; addNotification("Ошибка подтверждения получения", "error"); }
+            } 
+        }
+        
+        function openChatForOrder(orderId) { enableChat(orderId); scrollToChat(); }
+        function showReviewSuggestion(order) { setTimeout(() => { if(confirm(`Спасибо за покупку, ${order.customer.name}! Хотите оставить отзыв?`)) { openReviewModal(); } }, 800); }
+        
+        // ========== ОБРАБОТКА ФОРМЫ ЗАКАЗА С БЛОКИРОВКОЙ КНОПКИ ==========
+        document.getElementById("orderForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            if (orderInProgress) return;
+            const submitBtn = this.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            const phone = document.getElementById('phone').value;
+            if (!isValidPhone(phone)) { addNotification('❌ Введите корректный номер телефона', 'error'); return; }
+            
+            const delivery = document.querySelector("input[name='delivery']:checked").value;
+            const address = document.getElementById('address').value.trim();
+            if (delivery === 'courier' && !address) {
+                addNotification('❌ Укажите адрес доставки', 'error');
+                return;
+            }
+            
+            orderInProgress = true; submitBtn.disabled = true; submitBtn.textContent = '⏳ Обрабатывается…';
+            try {
+                const name = document.getElementById('name').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const comment = document.getElementById('comment').value.trim();
+                const deliveryMethod = delivery === 'pickup' ? 'Самовывоз' : 'Доставка';
+                const deliveryAddress = delivery === 'courier' ? address : 'ЖК Дубровка, Ясеневая улица, 1к1';
+                const total = cart.reduce((s, i) => s + i.price, 0);
+                const userId = localStorage.getItem('userId') || '';
+                const itemsSnapshot = [...cart];
+                const order = { 
+                    id: Date.now(), date: new Date().toLocaleString(), customer: { name, phone, email: '' }, 
+                    delivery: { method: deliveryMethod, address: deliveryAddress }, comment, items: itemsSnapshot, total, 
+                    status: 'processing', messages: [], createdAt: Date.now(), userId: userId
+                };
+                const success = await saveOrderToAPI(order);
+                if (success) {
+                    orders.unshift(order); localStorage.setItem('orders_cache', JSON.stringify(orders));
+                    cart = []; saveCart(); closeCheckoutModal(); renderOrdersSection();
+                    addNotification(`✅ Заказ от ${order.date} отправлен!`, 'success');
+                    addNotification(`✅ Чек составлен. Нажмите кнопку "🧾 Чек"`, 'info');
+                    enableChat(order.id);
+                    window.updateUserOrders('', name, phone);
+                    try {
+                        const itemsHtml = itemsSnapshot.map(i => `<div style="margin-bottom: 6px;">${i.name} — ${i.price} ₽</div>`).join("");
+                        const adminData = { 
+                            customer_name: name, customer_phone: phone, customer_email: '', 
+                            delivery: deliveryMethod, address: deliveryAddress, comment: comment || "—", 
+                            order_items: itemsHtml, order_total: total + " ₽",
+                            order_id: order.id, order_date: order.date
+                        };
+                        await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.adminTemplateId, adminData);
+                    } catch(emailError) { addNotification("⚠️ Заказ принят, но письмо не отправлено", "info"); }
+                } else { throw new Error('API error'); }
+            } catch (error) {
+                console.error('Order error:', error);
+                addNotification('❌ Ошибка при оформлении заказа. Попробуйте ещё раз', 'error');
+            } finally {
+                orderInProgress = false; submitBtn.disabled = false; submitBtn.textContent = originalText;
+            }
+        });
+        
+        function openCheckoutModal() { if(cart.length===0){ addNotification("Корзина пуста", "error"); return; } document.getElementById("checkoutModal").classList.add("active"); }
+        function closeCheckoutModal() { document.getElementById("checkoutModal").classList.remove("active"); document.getElementById("orderForm").reset(); document.getElementById("addressGroup").style.display="none"; }
+        document.querySelectorAll("input[name='delivery']").forEach(radio => {
+            radio.addEventListener('change', function() {
+                const pickupHint = document.getElementById('pickupAddressInfo');
+                const addressGroup = document.getElementById('addressGroup');
+                const addressInput = document.getElementById('address');
+                if (this.value === 'pickup') {
+                    pickupHint.classList.add('show');
+                    addressGroup.style.display = 'none';
+                    addressInput.removeAttribute('required');
+                } else {
+                    pickupHint.classList.remove('show');
+                    addressGroup.style.display = 'block';
+                    addressInput.setAttribute('required', 'required');
+                }
+            });
+        });
+        
+        // ========== ЧАТ (БЕЗ МОДЕРАЦИИ, С ЗАДЕРЖКОЙ) ==========
+        function enableChat(orderId) { 
+            const order=orders.find(o=>o.id===orderId); 
+            if(!order) return; 
+            currentOrderId=orderId; 
+            document.getElementById("chatSection").style.display="block"; 
+            document.getElementById("chatHeaderBtn").style.display="flex"; 
+            document.getElementById("chatOrderInfo").innerHTML = `💬 Заказ #${orderId} от ${order.date}`;
+            renderChatMessages(orderId);
+            const statusSpan = document.getElementById("chatStatus");
+            if(order.status==="processing"||order.status==="pending") statusSpan.innerHTML = "⏳ Ожидает подтверждения";
+            else if(order.status==="confirmed") statusSpan.innerHTML = "✅ Заказ подтверждён";
+            else if(order.status==="courier") statusSpan.innerHTML = "🚚 Курьер в пути";
+            else if(order.status==="delivered") statusSpan.innerHTML = "✅ Доставлен";
+            else if(order.status==="cancelled") statusSpan.innerHTML = "❌ Отменён";
+        }
+        
+        function renderChatMessages(orderId) { 
+            const order = orders.find(o => o.id === orderId); 
+            if (!order) return; 
+            const container = document.getElementById('chatMessages'); 
+            const messages = order.messages || [];
+            container.innerHTML = messages.map(msg => {
+                const isCustomer = msg.sender === 'customer';
+                let content = '';
+                if (msg.image) content += `<img src="${msg.image}" class="chat-image-preview" onclick="window.open(this.src)">`;
+                if (msg.text) content += `<div>${escapeHtml(msg.text)}</div>`;
+                return `<div class="chat-message ${isCustomer ? 'customer' : 'admin'}">
+                    <div class="chat-bubble">
+                        <div class="chat-sender">${isCustomer ? '👤 Вы' : '🛡️ Администратор'}</div>
+                        ${content}
+                    </div>
+                    <div class="chat-time">${msg.time || ''}</div>
+                </div>`;
+            }).join(""); 
+            container.scrollTop = container.scrollHeight; 
+        }
+        
+        function handleChatImageUpload(input) {
+            if (input.files.length) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    pendingChatImage = e.target.result;
+                    document.getElementById('chatImagePreview').src = e.target.result;
+                    document.getElementById('chatImagePreviewContainer').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function clearChatImage() {
+            pendingChatImage = null;
+            document.getElementById('chatImagePreviewContainer').style.display = 'none';
+            document.getElementById('chatImageInput').value = '';
+        }
+        
+        async function sendMessage() { 
+            if (!currentOrderId) { addNotification('Выберите заказ для чата', 'error'); return; }
+            if (sendingMessage) return;
+            
+            const order = orders.find(o => o.id === currentOrderId); 
+            if (!order) { addNotification('Чат недоступен', 'error'); return; }
+            
+            const input = document.getElementById('chatInput'); 
+            const text = input.value.trim(); 
+            if (!text && !pendingChatImage) return; 
+            
+            sendingMessage = true;
+            const sendBtn = document.getElementById('sendChatBtn');
+            const originalText = sendBtn.innerHTML;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="spinner"></span> Отправка...';
+            
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            order.messages = order.messages || [];
+            const msg = { 
+                sender: 'customer', 
+                text: text, 
+                time: new Date().toLocaleString('ru-RU'), 
+                timestamp: Date.now()
+            };
+            if (pendingChatImage) msg.image = pendingChatImage;
+            order.messages.push(msg);
+            
+            localStorage.setItem('orders_cache', JSON.stringify(orders)); 
+            await syncOrderWithAPI(order);
+            
+            input.value = ''; 
+            clearChatImage();
+            renderChatMessages(currentOrderId); 
+            addNotification('Сообщение отправлено', 'success');
+            
+            sendingMessage = false;
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = originalText;
+        }
+        
+        async function syncOrderWithAPI(order) {
+            try {
+                const res = await fetch(ORDERS_API_URL);
+                const records = await res.json();
+                const record = records.find(r => JSON.parse(r.data).id === order.id);
+                if (record) {
+                    await fetch(`${ORDERS_API_URL}/${record.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...record, data: JSON.stringify(order) })
+                    });
+                }
+            } catch (e) {}
+        }
+        
+        function checkForActiveChat() { 
+            const active = orders.find(o => !["delivered", "cancelled"].includes(o.status)); 
+            if (active) enableChat(active.id); 
+        }
+        
+        setInterval(async () => { 
+            if (currentOrderId) { 
+                await loadOrders();
+                const cur = orders.find(o => o.id === currentOrderId); 
+                if (cur) renderChatMessages(currentOrderId); 
+            }
+            await loadOrders();
+            renderOrdersSection();
+            updateHelpChatLink();
+        }, 10000);
+        
+        function escapeHtml(str) { if(!str) return ""; return str.replace(/[&<>]/g, function(m){ if(m==="&") return "&amp;"; if(m==="<") return "&lt;"; if(m===">") return "&gt;"; return m; }); }
+        
+        // ========== ПРОВЕРКА ОТЗЫВОВ ПОЛЬЗОВАТЕЛЯ ==========
+        async function hasUserLeftReview(userId) {
+            if (!userId) return false;
+            try {
+                const response = await fetch(REVIEWS_API_URL);
+                if (!response.ok) return false;
+                const allReviews = await response.json();
+                return allReviews.some(r => r.userId === userId);
+            } catch (error) { console.warn('Не удалось проверить отзывы:', error); return false; }
+        }
+
+        function openReviewModal() { 
+            const userId = localStorage.getItem('userId');
+            if (userId && reviews.some(r => r.userId === userId)) { 
+                addNotification('ℹ️ Вы уже оставили отзыв. Используйте кнопку редактировать', 'info'); 
+                return; 
+            }
+            hasUserLeftReview(userId).then(hasReview => {
+                if (hasReview) { addNotification('ℹ️ Вы уже оставили отзыв. Используйте кнопку редактировать', 'info'); return; }
+                editingReviewId = null;
+                document.getElementById('reviewModalTitle').textContent = 'Ваш отзыв';
+                document.getElementById('reviewSubmitBtn').textContent = '📝 Отправить отзыв';
+                document.getElementById('reviewForm').reset();
+                document.getElementById('reviewText').placeholder = 'Поделитесь впечатлениями...';
+                document.getElementById('reviewModal').classList.add('active');
+            });
+        }
+        
+        document.getElementById('reviewForm').addEventListener('submit', async function(e){
+            e.preventDefault();
+            const userId = localStorage.getItem('userId') || '';
+            if (!editingReviewId && userId && reviews.some(r => r.userId === userId)) { 
+                addNotification('ℹ️ Вы уже оставили отзыв. Используйте кнопку редактировать', 'info'); 
+                closeReviewModal(); 
+                return; 
+            }
+            const name = document.getElementById('reviewName').value.trim();
+            const rating = document.querySelector("input[name='rating']:checked");
+            const text = document.getElementById('reviewText').value.trim();
+            if(!name || !rating || !text) { addNotification('Заполните все поля', 'error'); return; }
+            const newReview = { name, rating: parseInt(rating.value), text, userId: userId, createdAt: new Date().toISOString() };
+            try {
+                const url = editingReviewId ? `${REVIEWS_API_URL}/${editingReviewId}` : REVIEWS_API_URL;
+                const method = editingReviewId ? 'PUT' : 'POST';
+                const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newReview) });
+                if (response.ok) {
+                    const saved = await response.json();
+                    if (editingReviewId) {
+                        const index = reviews.findIndex(r => r.id == editingReviewId);
+                        if (index !== -1) reviews[index] = { ...saved, date: new Date(saved.createdAt).toLocaleDateString('ru-RU'), userId: userId };
+                    } else {
+                        reviews.push({ ...saved, date: new Date(saved.createdAt).toLocaleDateString('ru-RU'), userId: userId });
+                    }
+                    localStorage.setItem('reviews_cache', JSON.stringify(reviews));
+                    addNotification(editingReviewId ? '✏️ Отзыв обновлён' : 'Спасибо за отзыв! ❤️', 'success'); 
+                    closeReviewModal(); 
+                    renderReviews();
+                    editingReviewId = null;
+                } else { throw new Error('API error'); }
+            } catch(error) { addNotification('❌ Ошибка отправки отзыва', 'error'); }
+        });
+        
+        function closeReviewModal() { document.getElementById('reviewModal').classList.remove('active'); }
+        
+        function renderReviews() {
+            const container = document.getElementById('reviewsList');
+            const avgRating = reviews.length ? (reviews.reduce((sum,r)=>sum+r.rating,0)/reviews.length).toFixed(1) : 0;
+            const existingAvg = document.querySelector(".average-rating");
+            const headerDiv = document.querySelector(".reviews-header");
+            if(!existingAvg) {
+                headerDiv.insertAdjacentHTML("afterbegin", `<div class="average-rating"><div class="average-stars">${[1,2,3,4,5].map(i=>`<span class="${i<=Math.round(avgRating)?"star-filled":"star-empty"}">★</span>`).join("")}</div><div class="average-number">${avgRating || "0"}</div></div>`);
+            } else {
+                const avgStars = existingAvg.querySelector(".average-stars"); const avgNum = existingAvg.querySelector(".average-number");
+                if(avgStars) avgStars.innerHTML = [1,2,3,4,5].map(i=>`<span class="${i<=Math.round(avgRating)?"star-filled":"star-empty"}">★</span>`).join("");
+                if(avgNum) avgNum.innerHTML = avgRating || "0";
+            }
+            if(!reviews.length) { container.innerHTML = "<div class='no-reviews'>✨ Пока нет отзывов. Будьте первым!</div>"; return; }
+            const currentUserId = localStorage.getItem("userId") || "";
+            container.innerHTML = reviews.slice().reverse().map(r => {
+                const canEdit = r.userId === currentUserId;
+                return `<div class="review-card"><div class="review-header"><span class="review-name">${escapeHtml(r.name)}</span><span class="review-date">${r.date}</span></div><div class="review-stars">${[1,2,3,4,5].map(i=>`<span class="${i<=r.rating?"star-filled":"star-empty"}" style="font-size:18px;">★</span>`).join("")}</div><div class="review-text">${escapeHtml(r.text)}</div><div class="review-actions">${canEdit ? `<button class="review-edit-btn" onclick="openEditReview('${r.id}')">✏️ Редактировать</button><button class="review-delete-btn" onclick="deleteReview('${r.id}')">🗑 Удалить</button>` : ""}</div></div>`;
+            }).join("");
+        }
+        
+        async function deleteReview(reviewId) {
+            if(confirm("Удалить отзыв?")) {
+                const review = reviews.find(r => r.id == reviewId);
+                if(review && review.userId === localStorage.getItem("userId")) {
+                    try {
+                        await fetch(`${REVIEWS_API_URL}/${reviewId}`, { method: "DELETE" });
+                        reviews = reviews.filter(r => r.id != reviewId);
+                        localStorage.setItem("reviews_cache", JSON.stringify(reviews));
+                        renderReviews(); addNotification(`Ваш отзыв удалён`, "error");
+                    } catch(e) { addNotification("Ошибка удаления", "error"); }
+                } else { addNotification("Вы можете удалять только свои отзывы", "error"); }
+            }
+        }
+        
+        function openEditReview(reviewId) {
+            const existing = reviews.find(r => r.id == reviewId);
+            if(!existing) return;
+            if(existing.userId !== localStorage.getItem("userId")) { addNotification("Вы можете редактировать только свои отзывы", "error"); return; }
+            editingReviewId = reviewId;
+            document.getElementById("reviewModalTitle").textContent = "Редактировать отзыв";
+            document.getElementById("reviewSubmitBtn").textContent = "✏️ Сохранить изменения";
+            document.getElementById("reviewName").value = existing.name;
+            document.getElementById("reviewText").value = existing.text;
+            const ratingInput = document.querySelector(`input[name="rating"][value="${existing.rating}"]`);
+            if(ratingInput) ratingInput.checked = true;
+            document.getElementById("reviewModal").classList.add("active");
+        }
+        
+        function prevImage(id){ const c=document.getElementById(`gallery-${id}`); const cur=parseInt(c.dataset.current||0); const slides=c.children.length; goToSlide(id,(cur-1+slides)%slides); }
+        function nextImage(id){ const c=document.getElementById(`gallery-${id}`); const cur=parseInt(c.dataset.current||0); const slides=c.children.length; goToSlide(id,(cur+1)%slides); }
+        function goToSlide(id,idx){ const c=document.getElementById(`gallery-${id}`); c.style.transform=`translateX(-${idx*100}%)`; c.dataset.current=idx; const nav=c.parentElement.querySelectorAll(".gallery-dot"); if(nav) nav.forEach((d,i)=>d.classList.toggle("active",i===idx)); }
+        function switchOrdersTab(tab) {
+            document.querySelectorAll(".orders-tab-btn").forEach(b => b.classList.remove("active"));
+            if(tab === "active") { document.querySelector(".orders-tab-btn").classList.add("active"); document.getElementById("activeOrdersTab").classList.add("active"); document.getElementById("historyOrdersTab").classList.remove("active"); } 
+            else { document.querySelectorAll(".orders-tab-btn")[1].classList.add("active"); document.getElementById("historyOrdersTab").classList.add("active"); document.getElementById("activeOrdersTab").classList.remove("active"); }
+        }
+        
+        // ========== ГЕНЕРАЦИЯ И ОТОБРАЖЕНИЕ ЧЕКА ==========
+        function showReceipt(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            const statusMap = {
+                'processing': { icon: '⏳', text: 'Обрабатывается', class: 'status-processing' },
+                'confirmed': { icon: '✅', text: 'Подтверждён', class: 'status-confirmed' },
+                'courier': { icon: '🚚', text: 'В пути', class: 'status-courier' },
+                'delivered': { icon: '✅', text: 'Доставлен', class: 'status-delivered' },
+                'cancelled': { icon: '❌', text: 'Отменён', class: 'status-cancelled' }
+            };
+            const status = statusMap[order.status] || { icon: '❓', text: order.status, class: '' };
+            const itemsHtml = (order.items || []).map(item => `<div class="receipt-item"><span class="receipt-item-name">${escapeHtml(item.name)}</span><span class="receipt-item-qty">×1</span><span class="receipt-item-price">${item.price} ₽</span></div>`).join('');
+            const modal = document.createElement('div');
+            modal.className = 'receipt-modal active';
+            modal.innerHTML = `<div class="receipt-content"><div class="receipt-header"><div class="receipt-title">🧸 Игрушки ЖК Дубровка</div><div class="receipt-order-id">Заказ #${order.id} от ${order.date}</div><div class="receipt-status ${status.class}">${status.icon} ${status.text}</div></div><div style="margin: 15px 0; font-size: 13px;"><div><strong>Покупатель:</strong> ${escapeHtml(order.customer?.name || '—')}</div><div><strong>Телефон:</strong> ${escapeHtml(order.customer?.phone || '—')}</div><div><strong>Получение:</strong> ${escapeHtml(order.delivery?.method || '—')}</div>${order.delivery?.method === 'Доставка' ? `<div><strong>Адрес:</strong> ${escapeHtml(order.delivery?.address || '—')}</div>` : ''}</div><div class="receipt-items">${itemsHtml}</div><div class="receipt-total"><span>Итого:</span><span>${(order.total || 0).toLocaleString('ru-RU')} ₽</span></div><div class="receipt-footer"><div>💵 Оплата: наличными при получении</div><div style="margin-top: 5px;">Спасибо за покупку! 🧸</div></div><button onclick="this.closest('.receipt-modal').remove(); event.stopPropagation();" style="margin-top: 20px; width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 50px; font-weight: 600; cursor: pointer;">✕ Закрыть</button></div>`;
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+            document.body.appendChild(modal);
+        }
+        
+        document.addEventListener("DOMContentLoaded", () => { loadData(); updateCartDisplay(); });
+
+        // ========== ФОНОВОЕ ОБНОВЛЕНИЕ ДАННЫХ ==========
+        let lastDataVersion = { orders: null, reviews: null, products: null };
+        async function checkForUpdates() {
+            try {
+                const productsRes = await fetch(`${PRODUCTS_URL}?v=${Date.now()}`);
+                if (productsRes.ok) {
+                    const productsData = await productsRes.json();
+                    const productsHash = JSON.stringify(productsData.products);
+                    if (lastDataVersion.products !== null && lastDataVersion.products !== productsHash) {
+                        categories = productsData.categories || []; allProducts = productsData.products || [];
+                        renderStatsBar(); renderCategories(); renderProducts(); console.log("📦 Товары обновлены из GitHub");
+                    }
+                    lastDataVersion.products = productsHash;
+                }
+                const ordersRes = await fetch(ORDERS_API_URL);
+                if (ordersRes.ok) {
+                    const ordersRecords = await ordersRes.json();
+                    const newOrders = ordersRecords.map(r => JSON.parse(r.data));
+                    const ordersHash = JSON.stringify(newOrders);
+                    if (lastDataVersion.orders !== null && lastDataVersion.orders !== ordersHash) {
+                        const userId = localStorage.getItem("userId");
+                        orders = userId ? newOrders.filter(o => o.userId === userId) : [];
+                        localStorage.setItem("orders_cache", JSON.stringify(orders)); renderOrdersSection(); console.log("📦 Заказы обновлены");
+                    }
+                    lastDataVersion.orders = ordersHash;
+                }
+                const reviewsRes = await fetch(REVIEWS_API_URL);
+                if (reviewsRes.ok) {
+                    const newReviews = await reviewsRes.json();
+                    const reviewsHash = JSON.stringify(newReviews.map(r => ({ ...r, date: r.createdAt })));
+                    if (lastDataVersion.reviews !== null && lastDataVersion.reviews !== reviewsHash) {
+                        reviews = newReviews.map(r => ({ ...r, date: r.createdAt ? new Date(r.createdAt).toLocaleDateString('ru-RU') : new Date().toLocaleDateString('ru-RU') }));
+                        localStorage.setItem("reviews_cache", JSON.stringify(reviews)); renderReviews(); console.log("⭐ Отзывы обновлены");
+                    }
+                    lastDataVersion.reviews = reviewsHash;
+                }
+            } catch(e) { console.log("⚠️ Фоновое обновление временно недоступно"); }
+        }
+        setInterval(() => { checkForUpdates(); }, 20000);
+        document.addEventListener("visibilitychange", function() { if (!document.hidden) { checkForUpdates(); } });
+
+        // ========== ОТСЛЕЖИВАНИЕ СОСТОЯНИЯ СЕТИ ==========
+        const networkBanner = document.getElementById("networkBanner");
+        function updateNetworkStatus() {
+            if (navigator.onLine) { networkBanner.classList.remove("show"); loadData(); } 
+            else { networkBanner.classList.add("show"); }
+        }
+        window.addEventListener("online", updateNetworkStatus); window.addEventListener("offline", updateNetworkStatus); updateNetworkStatus();
+        window.manualRefresh = function() { loadData(); addNotification("Данные обновлены вручную", "info"); };
+    </script>
+</body>
+</html>

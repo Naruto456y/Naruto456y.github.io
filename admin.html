@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="ru"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Админ-панель — ЖК Дубровка</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .admin-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .admin-header {
+            background: white; border-radius: 30px; padding: 20px 30px; margin-bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .admin-title { 
+            font-size: 24px; font-weight: 700; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            background-clip: text; -webkit-background-clip: text; color: transparent; 
+        }
+        .header-right { display: flex; gap: 15px; align-items: center; }
+        .notification-bell {
+            position: relative; background: #f0f0f0; border: none; border-radius: 50%;
+            width: 44px; height: 44px; font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .notification-badge {
+            position: absolute; top: -5px; right: -5px; background: #ff6b6b;
+            color: white; font-size: 11px; border-radius: 50%; width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .refresh-btn {
+            padding: 10px 20px; background: #2196f3; color: white; border: none;
+            border-radius: 50px; cursor: pointer; font-weight: 600;
+        }
+        .logout-btn {
+            padding: 10px 20px; background: #ff6b6b; color: white; border: none;
+            border-radius: 50px; cursor: pointer; font-weight: 600;
+        }
+        .logout-btn:hover, .refresh-btn:hover { transform: scale(1.05); }
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 12px 25px; background: white; border: none; border-radius: 50px; cursor: pointer;
+            font-weight: 600; transition: all 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .tab-btn.active { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; transform: translateY(-2px); 
+        }
+        .tab-btn:hover:not(.active) { transform: translateY(-2px); background: #f0f0f0; }
+        .tab-content { 
+            display: none; background: white; border-radius: 30px; padding: 30px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+        }
+        .tab-content.active { display: block; }
+        
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px; margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f8f0ff 0%, #efe6ff 100%);
+            border-radius: 20px; padding: 20px; text-align: center;
+            transition: transform 0.3s; cursor: pointer;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-value { font-size: 32px; font-weight: 800; color: #667eea; }
+        .stat-label { color: #666; margin-top: 5px; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
+        th { background: #f8f9fa; font-weight: 600; position: sticky; top: 0; }
+        
+        .status-badge { 
+            padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; 
+            display: inline-block; 
+        }
+        .status-processing { background: #ffd700; color: #333; }
+        .status-confirmed { background: #4caf50; color: white; }
+        .status-courier { background: #2196f3; color: white; }
+        .status-delivered { background: #9c27b0; color: white; }
+        .status-cancelled { background: #ff6b6b; color: white; }
+        
+        .btn {
+            padding: 6px 12px; border: none; border-radius: 20px; cursor: pointer;
+            font-weight: 600; margin: 2px; transition: all 0.2s; font-size: 12px;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+        .btn-confirm { background: #4caf50; color: white; }
+        .btn-courier { background: #2196f3; color: white; }
+        .btn-delivered { background: #9c27b0; color: white; }
+        .btn-cancel { background: #ff6b6b; color: white; }
+        .btn-chat { background: #667eea; color: white; }
+        .btn-edit { background: #ff9800; color: white; }
+        .btn-delete { background: #ff4444; color: white; }
+        .btn-info { background: #2196f3; color: white; }
+        .btn-add { background: #4caf50; color: white; }
+        .btn-json { background: #667eea; color: white; padding: 10px 20px; font-size: 14px; }
+        .btn-close-chat { background: #9c27b0; color: white; }
+        
+        .order-details-panel {
+            margin-top: 30px; background: #f8f9fa; border-radius: 20px;
+            padding: 25px; border: 1px solid #e0e0e0; display: none;
+        }
+        .order-details-panel.active { display: block; }
+        .details-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #667eea;
+        }
+        .details-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 20px; 
+        }
+        .details-card {
+            background: white; border-radius: 20px; padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .details-row { display: flex; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+        .details-label { width: 130px; font-weight: 600; color: #666; }
+        .details-value { flex: 1; color: #333; word-break: break-word; }
+        
+        .chat-container { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+        .chat-orders-list {
+            background: #f8f9fa; border-radius: 20px; padding: 15px;
+            max-height: 600px; overflow-y: auto;
+        }
+        .chat-order-item {
+            padding: 15px; background: white; border-radius: 15px; margin-bottom: 10px;
+            cursor: pointer; border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .chat-order-item.active { border-left-color: #667eea; background: #f0eaff; }
+        .chat-order-item .badge {
+            background: #ff9800; color: white; padding: 2px 8px; border-radius: 20px;
+            font-size: 11px; margin-left: 5px;
+        }
+        .chat-main {
+            background: #f8f9fa; border-radius: 20px; padding: 20px;
+            display: flex; flex-direction: column;
+        }
+        .chat-messages {
+            flex: 1; height: 400px; overflow-y: auto; padding: 15px;
+            background: white; border-radius: 15px; margin-bottom: 15px;
+        }
+        .chat-message { margin-bottom: 15px; display: flex; flex-direction: column; }
+        .chat-message.customer { align-items: flex-start; }
+        .chat-message.admin { align-items: flex-end; }
+        .chat-bubble {
+            max-width: 75%; padding: 12px 16px; border-radius: 18px; word-wrap: break-word;
+        }
+        .chat-message.customer .chat-bubble { background: #e3f2fd; color: #333; }
+        .chat-message.admin .chat-bubble { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+        }
+        .chat-sender {
+            font-weight: 700; margin-bottom: 4px; font-size: 12px; opacity: 0.8;
+        }
+        .chat-message.customer .chat-sender { color: #1565c0; }
+        .chat-message.admin .chat-sender { color: #e3f2fd; }
+        .chat-time { font-size: 10px; color: #999; margin-top: 4px; }
+        .chat-image-preview {
+            max-width: 200px; max-height: 150px; border-radius: 12px; margin-top: 8px; cursor: pointer;
+        }
+        .chat-input-area { display: flex; gap: 10px; align-items: center; }
+        .chat-input-area input {
+            flex: 1; padding: 12px; border: 2px solid #e0e0e0;
+            border-radius: 25px; font-size: 14px;
+        }
+        .chat-input-area input:disabled {
+            background: #f5f5f5; cursor: not-allowed;
+        }
+        .chat-image-upload-btn {
+            padding: 10px 15px; background: #f0f0f0; border-radius: 50px; cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+            z-index: 1000; padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white; border-radius: 30px; padding: 30px; max-width: 550px;
+            width: 100%; max-height: 90vh; overflow-y: auto;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 12px; border: 2px solid #f0f0f0;
+            border-radius: 15px; font-size: 16px;
+        }
+        
+        .notification-center {
+            position: fixed; top: 80px; right: 20px; width: 350px; background: white;
+            border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 1001;
+            display: none; flex-direction: column; max-height: 500px;
+        }
+        .notification-center.active { display: flex; }
+        .notification-header {
+            padding: 15px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between;
+        }
+        .notification-list { overflow-y: auto; padding: 10px; }
+        .notification-item {
+            padding: 12px 15px; border-radius: 15px; margin-bottom: 8px;
+            background: #f8f9fa; border-left: 3px solid #667eea;
+        }
+        .notification-item.success { border-left-color: #4caf50; }
+        .notification-item.error { border-left-color: #ff6b6b; }
+        .notification-item.warning { border-left-color: #ff9800; }
+        .notification-time { font-size: 11px; color: #999; margin-top: 5px; }
+        
+        .toast-notification {
+            position: fixed; bottom: 20px; right: 20px; background: white;
+            border-radius: 15px; padding: 12px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1002; display: flex; align-items: center; gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .json-container {
+            background: #1e1e1e; border-radius: 20px; padding: 20px;
+        }
+        .json-header {
+            display: flex; gap: 10px; margin-bottom: 15px;
+        }
+        .json-display {
+            background: #0d0d0d; color: #d4d4d4; padding: 20px; border-radius: 15px;
+            font-family: 'Courier New', monospace; font-size: 13px; overflow: auto;
+            max-height: 500px; white-space: pre-wrap; word-break: break-all;
+        }
+        
+        .login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .login-box {
+            background: white; border-radius: 30px; padding: 40px; width: 350px;
+            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .login-box input {
+            width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #f0f0f0;
+            border-radius: 25px; font-size: 16px;
+        }
+        .login-box button {
+            padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600;
+        }
+        .error { color: #ff6b6b; margin-top: 10px; }
+        
+        .product-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 10px; }
+        .product-images-preview { display: flex; gap: 5px; flex-wrap: wrap; }
+        .drop-zone {
+            border: 2px dashed #667eea; border-radius: 20px; padding: 20px; text-align: center;
+            background: #f8f9fa; cursor: pointer; margin: 10px 0;
+        }
+        .drop-zone.drag-over { background: #e3f2fd; border-color: #4caf50; }
+        .uploaded-images { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .uploaded-image { position: relative; width: 80px; height: 80px; }
+        .uploaded-image img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+        .remove-image {
+            position: absolute; top: -5px; right: -5px; background: #ff6b6b; color: white;
+            border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-container { padding: 10px; }
+            .admin-header { padding: 15px; flex-direction: column; }
+            .tabs { gap: 8px; }
+            .tab-btn { padding: 8px 16px; font-size: 12px; }
+            .chat-container { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            th, td { font-size: 12px; padding: 8px; }
+            .btn { padding: 4px 8px; font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h2>🔐 Админ-панель</h2>
+            <input type="password" id="adminPassword" placeholder="Введите пароль" onkeypress="if(event.key==='Enter')checkPassword()">
+            <button onclick="checkPassword()">Войти</button>
+            <div id="loginError" class="error"></div>
+        </div>
+    </div>
+
+    <div id="adminContent" style="display: none;">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1 class="admin-title">🔐 Админ-панель</h1>
+                <div class="header-right">
+                    <button class="notification-bell" onclick="toggleNotificationCenter()">
+                        🔔 <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+                    </button>
+                    <button class="refresh-btn" onclick="refreshAllData()">🔄 Обновить</button>
+                    <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Статистика</button>
+                <button class="tab-btn" onclick="switchTab('orders')">📦 Заказы</button>
+                <button class="tab-btn" onclick="switchTab('chat')">💬 Чат <span id="chatTabBadge" class="notification-badge" style="display: none; margin-left: 5px;">0</span></button>
+                <button class="tab-btn" onclick="switchTab('users')">👥 Пользователи</button>
+                <button class="tab-btn" onclick="switchTab('reviews')">⭐ Отзывы</button>
+                <button class="tab-btn" onclick="switchTab('products')">🎁 Товары</button>
+                <button class="tab-btn" onclick="switchTab('json')">📄 JSON</button>
+            </div>
+
+            <!-- ДАШБОРД -->
+            <div id="tab-dashboard" class="tab-content active">
+                <div class="stats-grid" id="statsGrid"></div>
+                <h3 style="margin: 20px 0;">📋 Последние заказы</h3>
+                <div id="recentOrdersList"></div>
+            </div>
+
+            <!-- ЗАКАЗЫ -->
+            <div id="tab-orders" class="tab-content">
+                <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-info" onclick="refreshAllData()">🔄 Обновить</button>
+                    <button class="btn btn-delete" onclick="deleteAllOrders()">🗑 Удалить все</button>
+                </div>
+                <div id="ordersList"></div>
+                <div id="orderDetailsPanel" class="order-details-panel">
+                    <div class="details-header">
+                        <h3>📋 Детали заказа</h3>
+                        <button onclick="closeOrderDetails()" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
+                    </div>
+                    <div id="orderDetailsContent"></div>
+                </div>
+            </div>
+
+            <!-- ЧАТ -->
+            <div id="tab-chat" class="tab-content">
+                <div class="chat-container">
+                    <div class="chat-orders-list" id="chatOrdersList"></div>
+                    <div class="chat-main">
+                        <div id="chatPlaceholder" style="text-align:center;padding:50px;color:#999;">👈 Выберите заказ для чата</div>
+                        <div id="activeChatArea" style="display:none;">
+                            <div style="margin-bottom:15px;padding:10px;background:#e3f2fd;border-radius:15px;display:flex;justify-content:space-between;align-items:center;">
+                                <span id="activeChatInfo"></span>
+                                <button class="btn btn-close-chat" id="closeChatBtn" onclick="closeChat()">🔒 Завершить чат</button>
+                            </div>
+                            <div class="chat-messages" id="chatMessages"></div>
+                            <div class="chat-input-area" id="chatInputArea">
+                                <input type="text" id="chatInput" placeholder="Введите сообщение..." onkeypress="if(event.key==='Enter')sendAdminMessage()">
+                                <span class="chat-image-upload-btn" onclick="document.getElementById('adminChatImageInput').click()">🖼️</span>
+                                <input type="file" id="adminChatImageInput" accept="image/*" style="display:none" onchange="handleAdminChatImageUpload(this)">
+                                <button class="btn btn-chat" id="sendChatBtn" onclick="sendAdminMessage()">📤</button>
+                            </div>
+                            <div id="adminChatImagePreviewContainer" style="margin-top:10px; display:none;">
+                                <img id="adminChatImagePreview" style="max-width:150px; max-height:100px; border-radius:10px;">
+                                <button onclick="clearAdminChatImage()" style="margin-left:10px;" class="btn btn-delete">✖️</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ПОЛЬЗОВАТЕЛИ -->
+            <div id="tab-users" class="tab-content">
+                <div style="margin-bottom:15px;">
+                    <button class="btn btn-info" onclick="refreshAllData()">🔄 Обновить</button>
+                </div>
+                <div id="usersList"></div>
+            </div>
+
+            <!-- ОТЗЫВЫ -->
+            <div id="tab-reviews" class="tab-content">
+                <div style="margin-bottom:15px;">
+                    <button class="btn btn-info" onclick="refreshAllData()">🔄 Обновить</button>
+                    <button class="btn btn-delete" onclick="deleteAllReviews()">🗑 Удалить все</button>
+                </div>
+                <div id="reviewsList"></div>
+                <div class="modal" id="reviewDetailModal">
+                    <div class="modal-content">
+                        <h3>📝 Отзыв</h3>
+                        <div id="reviewDetailContent"></div>
+                        <button class="btn btn-cancel" onclick="closeReviewDetail()" style="margin-top:15px;">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ТОВАРЫ -->
+            <div id="tab-products" class="tab-content">
+                <div style="margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="btn btn-add" onclick="openAddCategoryModal()">➕ Категория</button>
+                    <button class="btn btn-add" onclick="openAddProductModal()">➕ Товар</button>
+                    <button class="btn btn-info" onclick="refreshAllData()">🔄 Обновить</button>
+                </div>
+                <div id="productsList"></div>
+            </div>
+
+            <!-- JSON -->
+            <div id="tab-json" class="tab-content">
+                <div class="json-container">
+                    <div class="json-header">
+                        <button class="btn btn-json" onclick="copyJSON()">📋 Копировать</button>
+                        <button class="btn btn-json" onclick="downloadJSON()">💾 Скачать</button>
+                    </div>
+                    <pre class="json-display" id="jsonDisplay">Загрузка...</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Центр уведомлений -->
+    <div id="notificationCenter" class="notification-center">
+        <div class="notification-header">
+            <span><strong>🔔 Уведомления</strong></span>
+            <button onclick="toggleNotificationCenter()" style="background:none;border:none;color:white;cursor:pointer;">✕</button>
+        </div>
+        <div class="notification-list" id="notificationList"></div>
+        <div style="padding:10px;text-align:center;border-top:1px solid #eee;">
+            <button class="btn btn-delete" onclick="clearAllNotifications()">🗑 Очистить все</button>
+        </div>
+    </div>
+
+    <!-- Модалка статуса -->
+    <div class="modal" id="statusModal">
+        <div class="modal-content">
+            <h3>✏️ Изменить статус заказа</h3>
+            <input type="hidden" id="editingOrderId">
+            <div class="form-group">
+                <label>Новый статус</label>
+                <select id="newStatusSelect">
+                    <option value="processing">⏳ Обрабатывается</option>
+                    <option value="confirmed">✅ Подтверждён</option>
+                    <option value="courier">🚚 Курьер в пути</option>
+                    <option value="delivered">✅ Доставлен</option>
+                    <option value="cancelled">❌ Отменён</option>
+                </select>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="btn btn-confirm" onclick="saveOrderStatus()">💾 Сохранить</button>
+                <button class="btn btn-cancel" onclick="closeStatusModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка категории -->
+    <div class="modal" id="addCategoryModal">
+        <div class="modal-content">
+            <h3>➕ Новая категория</h3>
+            <div class="form-group"><label>ID (латиница)</label><input type="text" id="newCatId"></div>
+            <div class="form-group"><label>Название</label><input type="text" id="newCatName"></div>
+            <div class="form-group"><label>Иконка (эмодзи)</label><input type="text" id="newCatIcon" placeholder="🧸"></div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="btn btn-confirm" onclick="addCategory()">Добавить</button>
+                <button class="btn btn-cancel" onclick="closeAddCategoryModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка товара -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <h3 id="productModalTitle">➕ Новый товар</h3>
+            <input type="hidden" id="editingProductId">
+            <div class="form-group"><label>Название</label><input type="text" id="prodName"></div>
+            <div class="form-group"><label>Цена (₽)</label><input type="number" id="prodPrice"></div>
+            <div class="form-group"><label>Описание</label><textarea id="prodDesc" rows="3"></textarea></div>
+            <div class="form-group"><label>Категория</label><select id="prodCategory"></select></div>
+            <div class="form-group">
+                <label>Изображения (до 3)</label>
+                <div class="drop-zone" id="dropZone">📁 Перетащите или кликните (макс. 3)</div>
+                <input type="file" id="imageInput" multiple accept="image/*" style="display:none">
+                <div class="uploaded-images" id="uploadedImages"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="btn btn-confirm" onclick="saveProduct()">💾 Сохранить</button>
+                <button class="btn btn-cancel" onclick="closeProductModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== КОНФИГУРАЦИЯ ==========
+        const ADMIN_PASSWORD = "ЧеБуРеК5656";
+        const ORDERS_API = "https://69c3e454b780a9ba03e8426f.mockapi.io/api/v1/orders";
+        const REVIEWS_API = "https://69c3e454b780a9ba03e8426f.mockapi.io/api/v1/reviews";
+        const PRODUCTS_URL = "https://naruto456y.github.io/data.json";
+        
+        let allOrders = [];
+        let allReviews = [];
+        let allProducts = [];
+        let categories = [];
+        let currentChatOrderId = null;
+        let currentChatClosed = false;
+        let notifications = JSON.parse(localStorage.getItem("admin_notifications") || "[]");
+        let notificationsRead = true;
+        let tempImages = [];
+        let pendingAdminChatImage = null;
+
+        // ========== УВЕДОМЛЕНИЯ ==========
+        function addNotification(message, type = "info") {
+            const notification = { id: Date.now(), message, type, time: new Date().toLocaleString("ru-RU") };
+            notifications.push(notification);
+            if (notifications.length > 100) notifications.shift();
+            localStorage.setItem("admin_notifications", JSON.stringify(notifications));
+            const toast = document.createElement("div");
+            toast.className = "toast-notification";
+            toast.style.background = type === "success" ? "#4caf50" : type === "error" ? "#ff6b6b" : type === "warning" ? "#ff9800" : "#667eea";
+            toast.style.color = "white";
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+            renderNotificationCenter();
+            updateNotificationBadge();
+        }
+        
+        function renderNotificationCenter() {
+            const container = document.getElementById("notificationList");
+            if (!container) return;
+            if (!notifications.length) {
+                container.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">Нет уведомлений</div>';
+                return;
+            }
+            container.innerHTML = notifications.slice().reverse().slice(0, 20).map(n => `
+                <div class="notification-item ${n.type}">
+                    <div>${n.message}</div>
+                    <div class="notification-time">${n.time}</div>
+                </div>
+            `).join("");
+        }
+        
+        function updateNotificationBadge() {
+            const badge = document.getElementById("notificationBadge");
+            if (!notificationsRead && notifications.length > 0) {
+                badge.textContent = notifications.length;
+                badge.style.display = "flex";
+            } else {
+                badge.style.display = "none";
+            }
+        }
+        
+        function toggleNotificationCenter() {
+            const center = document.getElementById("notificationCenter");
+            center.classList.toggle("active");
+            if (center.classList.contains("active")) {
+                notificationsRead = true;
+                updateNotificationBadge();
+            }
+        }
+        
+        function clearAllNotifications() {
+            notifications = [];
+            localStorage.setItem("admin_notifications", JSON.stringify(notifications));
+            renderNotificationCenter();
+            updateNotificationBadge();
+        }
+        
+        function updateChatTabBadge() {
+            const pending = allOrders.reduce((s, o) => 
+                s + (o.messages || []).filter(m => m.sender === "customer" && !m.approved).length, 0
+            );
+            const badge = document.getElementById("chatTabBadge");
+            if (pending > 0) {
+                badge.textContent = pending;
+                badge.style.display = "inline-block";
+            } else {
+                badge.style.display = "none";
+            }
+        }
+        
+        // ========== АВТОРИЗАЦИЯ ==========
+        function checkPassword() {
+            if (document.getElementById("adminPassword").value === ADMIN_PASSWORD) {
+                localStorage.setItem("adminAuth", "true");
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("adminContent").style.display = "block";
+                loadAllData();
+                addNotification("✅ Вход выполнен", "success");
+            } else {
+                document.getElementById("loginError").textContent = "❌ Неверный пароль";
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem("adminAuth");
+            location.reload();
+        }
+        
+        // ========== ЗАГРУЗКА ДАННЫХ ==========
+        async function loadAllData() {
+            try {
+                const ordersRes = await fetch(ORDERS_API);
+                if (ordersRes.ok) {
+                    const records = await ordersRes.json();
+                    allOrders = records.map(r => { try { return { ...JSON.parse(r.data), mockId: r.id }; } catch { return null; } }).filter(o => o);
+                }
+                
+                const reviewsRes = await fetch(REVIEWS_API);
+                if (reviewsRes.ok) {
+                    allReviews = await reviewsRes.json();
+                    allReviews = allReviews.map(r => ({ ...r, date: r.createdAt ? new Date(r.createdAt).toLocaleDateString("ru-RU") : "" }));
+                }
+                
+                const productsRes = await fetch(PRODUCTS_URL + "?v=" + Date.now());
+                if (productsRes.ok) {
+                    const data = await productsRes.json();
+                    categories = data.categories || [];
+                    allProducts = data.products || [];
+                }
+                
+                const savedProducts = JSON.parse(localStorage.getItem("editedProducts") || "{}");
+                for (let key in savedProducts) {
+                    const p = savedProducts[key];
+                    const idx = allProducts.findIndex(prod => prod.id === p.id);
+                    if (idx !== -1) allProducts[idx] = p; else allProducts.push(p);
+                }
+                
+            } catch (e) {
+                console.error("Ошибка загрузки:", e);
+                addNotification("⚠️ Ошибка загрузки данных", "error");
+            }
+            
+            renderDashboard();
+            renderOrdersList();
+            renderChatOrdersList();
+            renderUsersList();
+            renderReviewsList();
+            renderProductsList();
+            renderJSON();
+            updateChatTabBadge();
+        }
+        
+        async function refreshAllData() {
+            await loadAllData();
+            addNotification("🔄 Данные обновлены", "success");
+        }
+        
+        // ========== РЕНДЕРИНГ ==========
+        function renderDashboard() {
+            const total = allOrders.length;
+            const active = allOrders.filter(o => !["delivered", "cancelled"].includes(o.status)).length;
+            const delivered = allOrders.filter(o => o.status === "delivered").length;
+            const revenue = allOrders.filter(o => o.status === "delivered").reduce((s, o) => s + (o.total || 0), 0);
+            const pendingMsgs = allOrders.reduce((s, o) => s + (o.messages || []).filter(m => m.sender === "customer" && !m.approved).length, 0);
+            
+            document.getElementById("statsGrid").innerHTML = `
+                <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Всего заказов</div></div>
+                <div class="stat-card"><div class="stat-value">${active}</div><div class="stat-label">Активных</div></div>
+                <div class="stat-card"><div class="stat-value">${delivered}</div><div class="stat-label">Доставлено</div></div>
+                <div class="stat-card"><div class="stat-value">${revenue} ₽</div><div class="stat-label">Выручка</div></div>
+                <div class="stat-card"><div class="stat-value">${allProducts.length}</div><div class="stat-label">Товаров</div></div>
+                <div class="stat-card"><div class="stat-value">${allReviews.length}</div><div class="stat-label">Отзывов</div></div>
+                <div class="stat-card"><div class="stat-value">${pendingMsgs}</div><div class="stat-label">На модерации</div></div>
+            `;
+            
+            const recent = allOrders.slice(-5).reverse();
+            document.getElementById("recentOrdersList").innerHTML = recent.length ? recent.map(o => `
+                <div style="background:#f8f9fa;border-radius:15px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <strong>#${o.id}</strong> — ${escapeHtml(o.customer?.name || "—")}<br>
+                        <small>${o.date}</small>
+                    </div>
+                    <div>
+                        <span class="status-badge status-${o.status}">${getStatusLabel(o.status)}</span>
+                        <span style="margin-left:15px;font-weight:700;">${o.total} ₽</span>
+                    </div>
+                </div>
+            `).join("") : "<p>Нет заказов</p>";
+        }
+        
+        function getStatusLabel(status) {
+            const labels = {
+                processing: "⏳ Обрабатывается",
+                confirmed: "✅ Подтверждён",
+                courier: "🚚 В пути",
+                delivered: "✅ Доставлен",
+                cancelled: "❌ Отменён"
+            };
+            return labels[status] || status;
+        }
+        
+        function renderOrdersList() {
+            const container = document.getElementById("ordersList");
+            if (!allOrders.length) {
+                container.innerHTML = "<p>Заказов нет</p>";
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>ID</th><th>Дата</th><th>Покупатель</th><th>Сумма</th><th>Статус</th><th>Действия</th></tr></thead><tbody>';
+            allOrders.slice().reverse().forEach(o => {
+                html += `<tr>
+                    <td>#${o.id}</td>
+                    <td>${o.date}</td>
+                    <td>${escapeHtml(o.customer?.name)}<br><small>${o.customer?.phone}</small></td>
+                    <td>${o.total} ₽</td>
+                    <td><span class="status-badge status-${o.status}">${getStatusLabel(o.status)}</span></td>
+                    <td>
+                        <button class="btn btn-info" onclick="viewOrderDetails('${o.id}')" title="Детали">📋</button>
+                        <button class="btn btn-edit" onclick="openStatusModal('${o.id}', '${o.status}')" title="Сменить статус">✏️</button>
+                        ${o.status === 'processing' ? `<button class="btn btn-confirm" onclick="updateOrderStatusDirect('${o.id}', 'confirmed')" title="Подтвердить">✅</button>` : ''}
+                        ${o.status === 'confirmed' ? `<button class="btn btn-courier" onclick="updateOrderStatusDirect('${o.id}', 'courier')" title="Курьер">🚚</button>` : ''}
+                        ${o.status === 'courier' ? `<button class="btn btn-delivered" onclick="updateOrderStatusDirect('${o.id}', 'delivered')" title="Доставлен">✅</button>` : ''}
+                        ${o.status !== 'delivered' && o.status !== 'cancelled' ? `<button class="btn btn-cancel" onclick="updateOrderStatusDirect('${o.id}', 'cancelled')" title="Отменить">❌</button>` : ''}
+                        <button class="btn btn-chat" onclick="openChatForOrder('${o.id}')" title="Чат">💬</button>
+                        <button class="btn btn-delete" onclick="deleteOrder('${o.id}')" title="Удалить">🗑</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function viewOrderDetails(orderId) {
+            const order = allOrders.find(o => o.id == orderId);
+            if (!order) return;
+            
+            document.getElementById("orderDetailsContent").innerHTML = `
+                <div class="details-grid">
+                    <div class="details-card">
+                        <h4>👤 Покупатель</h4>
+                        <div class="details-row"><span class="details-label">Имя:</span><span class="details-value">${escapeHtml(order.customer?.name)}</span></div>
+                        <div class="details-row"><span class="details-label">Телефон:</span><span class="details-value">${escapeHtml(order.customer?.phone)}</span></div>
+                    </div>
+                    <div class="details-card">
+                        <h4>🚚 Доставка</h4>
+                        <div class="details-row"><span class="details-label">Способ:</span><span class="details-value">${order.delivery?.method}</span></div>
+                        <div class="details-row"><span class="details-label">Адрес:</span><span class="details-value">${escapeHtml(order.delivery?.address)}</span></div>
+                        <div class="details-row"><span class="details-label">Комментарий:</span><span class="details-value">${escapeHtml(order.comment || "—")}</span></div>
+                    </div>
+                    <div class="details-card">
+                        <h4>📦 Товары</h4>
+                        ${(order.items || []).map(i => `<div style="display:flex;justify-content:space-between;padding:5px 0;">${escapeHtml(i.name)}<span>${i.price} ₽</span></div>`).join("")}
+                        <div style="margin-top:15px;text-align:right;font-weight:700;color:#4caf50;">Итого: ${order.total} ₽</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById("orderDetailsPanel").classList.add("active");
+        }
+        
+        function closeOrderDetails() {
+            document.getElementById("orderDetailsPanel").classList.remove("active");
+        }
+        
+        function openStatusModal(orderId, currentStatus) {
+            document.getElementById("editingOrderId").value = orderId;
+            document.getElementById("newStatusSelect").value = currentStatus;
+            document.getElementById("statusModal").classList.add("active");
+        }
+        
+        function closeStatusModal() {
+            document.getElementById("statusModal").classList.remove("active");
+        }
+        
+        async function saveOrderStatus() {
+            const orderId = document.getElementById("editingOrderId").value;
+            const newStatus = document.getElementById("newStatusSelect").value;
+            await updateOrderStatusDirect(orderId, newStatus);
+            closeStatusModal();
+        }
+        
+        async function updateOrderStatusDirect(orderId, newStatus) {
+            const order = allOrders.find(o => o.id == orderId);
+            if (!order) return;
+            const oldStatus = order.status;
+            order.status = newStatus;
+            
+            try {
+                const res = await fetch(ORDERS_API);
+                const records = await res.json();
+                const record = records.find(r => JSON.parse(r.data).id == orderId);
+                if (record) {
+                    await fetch(`${ORDERS_API}/${record.id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ...record, data: JSON.stringify(order) })
+                    });
+                    addNotification(`Статус заказа #${orderId}: ${getStatusLabel(oldStatus)} → ${getStatusLabel(newStatus)}`, "success");
+                    await loadAllData();
+                }
+            } catch (e) {
+                addNotification("Ошибка обновления статуса", "error");
+            }
+        }
+        
+        async function deleteOrder(orderId) {
+            if (!confirm("Удалить заказ?")) return;
+            try {
+                const res = await fetch(ORDERS_API);
+                const records = await res.json();
+                const record = records.find(r => JSON.parse(r.data).id == orderId);
+                if (record) {
+                    await fetch(`${ORDERS_API}/${record.id}`, { method: "DELETE" });
+                    addNotification(`Заказ #${orderId} удалён`, "error");
+                    await loadAllData();
+                }
+            } catch (e) {
+                addNotification("Ошибка удаления", "error");
+            }
+        }
+        
+        async function deleteAllOrders() {
+            if (!confirm("Удалить ВСЕ заказы?")) return;
+            try {
+                const res = await fetch(ORDERS_API);
+                const records = await res.json();
+                for (const r of records) {
+                    await fetch(`${ORDERS_API}/${r.id}`, { method: "DELETE" });
+                }
+                addNotification("Все заказы удалены", "error");
+                await loadAllData();
+            } catch (e) {
+                addNotification("Ошибка", "error");
+            }
+        }
+        
+        // ========== ЧАТ ==========
+        function renderChatOrdersList() {
+            const allOrdersList = allOrders;
+            const container = document.getElementById("chatOrdersList");
+            
+            if (!allOrdersList.length) {
+                container.innerHTML = "<p style='padding:20px;text-align:center;'>Нет заказов</p>";
+                return;
+            }
+            
+            container.innerHTML = allOrdersList.map(o => {
+                const pending = (o.messages || []).filter(m => m.sender === "customer" && !m.approved).length;
+                return `
+                    <div class="chat-order-item ${currentChatOrderId == o.id ? 'active' : ''}" onclick="openChatForOrder('${o.id}')">
+                        <div><strong>#${o.id}</strong> — ${escapeHtml(o.customer?.name || "—")}</div>
+                        <div style="font-size:12px;color:#666;">${getStatusLabel(o.status)}</div>
+                        ${pending > 0 ? `<span class="badge">${pending} новых</span>` : ""}
+                        ${o.chatClosed ? '<span style="color:#ff6b6b;font-size:11px;">🔒 Закрыт</span>' : ''}
+                    </div>
+                `;
+            }).join("");
+        }
+        
+        function openChatForOrder(orderId) {
+            const order = allOrders.find(o => o.id == orderId);
+            if (!order) return;
+            
+            currentChatOrderId = orderId;
+            currentChatClosed = order.chatClosed || false;
+            document.getElementById("chatPlaceholder").style.display = "none";
+            document.getElementById("activeChatArea").style.display = "block";
+            document.getElementById("activeChatInfo").innerHTML = `
+                💬 Чат с ${escapeHtml(order.customer?.name)} (Заказ #${orderId}) — ${order.customer?.phone}
+            `;
+            
+            // Блокировка ввода если чат закрыт
+            const chatInput = document.getElementById("chatInput");
+            const sendBtn = document.getElementById("sendChatBtn");
+            const closeBtn = document.getElementById("closeChatBtn");
+            
+            if (order.chatClosed) {
+                chatInput.disabled = true;
+                chatInput.placeholder = "Чат завершён";
+                sendBtn.disabled = true;
+                closeBtn.style.display = 'none';
+            } else {
+                chatInput.disabled = false;
+                chatInput.placeholder = "Введите сообщение...";
+                sendBtn.disabled = false;
+                closeBtn.style.display = 'inline-flex';
+            }
+            
+            renderChatOrdersList();
+            renderChatMessages(order);
+        }
+        
+        function renderChatMessages(order) {
+            const container = document.getElementById("chatMessages");
+            const messages = order.messages || [];
+            
+            if (!messages.length) {
+                container.innerHTML = "<div style='text-align:center;padding:30px;color:#999;'>Нет сообщений</div>";
+                return;
+            }
+            
+            container.innerHTML = messages.map(m => {
+                const isCustomer = m.sender === "customer";
+                let content = '';
+                if (m.image) content += `<img src="${m.image}" class="chat-image-preview" onclick="window.open(this.src)">`;
+                if (m.text) content += `<div>${escapeHtml(m.text)}</div>`;
+                
+                return `
+                    <div class="chat-message ${m.sender}">
+                        <div class="chat-bubble">
+                            <div class="chat-sender">${isCustomer ? '👤 ' + escapeHtml(order.customer?.name || 'Клиент') : '🛡️ Вы'}</div>
+                            ${content}
+                        </div>
+                        <div class="chat-time">${m.time || ""}</div>
+                    </div>
+                `;
+            }).join("");
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        async function closeChat() {
+            if (!currentChatOrderId) return;
+            if (!confirm("Завершить чат? Клиент больше не сможет отправлять сообщения.")) return;
+            
+            const order = allOrders.find(o => o.id == currentChatOrderId);
+            if (!order) return;
+            
+            order.chatClosed = true;
+            order.messages = order.messages || [];
+            order.messages.push({
+                sender: "admin",
+                text: "Чат закрыт администратором",
+                time: new Date().toLocaleString("ru-RU"),
+                timestamp: Date.now()
+            });
+            
+            await updateOrderInAPI(order);
+            
+            currentChatClosed = true;
+            document.getElementById("chatInput").disabled = true;
+            document.getElementById("chatInput").placeholder = "Чат завершён";
+            document.getElementById("sendChatBtn").disabled = true;
+            document.getElementById("closeChatBtn").style.display = 'none';
+            
+            renderChatMessages(order);
+            renderChatOrdersList();
+            addNotification(`Чат с заказом #${order.id} завершён`, "warning");
+        }
+        
+        function handleAdminChatImageUpload(input) {
+            if (input.files.length) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    pendingAdminChatImage = e.target.result;
+                    document.getElementById('adminChatImagePreview').src = e.target.result;
+                    document.getElementById('adminChatImagePreviewContainer').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function clearAdminChatImage() {
+            pendingAdminChatImage = null;
+            document.getElementById('adminChatImagePreviewContainer').style.display = 'none';
+            document.getElementById('adminChatImageInput').value = '';
+        }
+        
+        async function sendAdminMessage() {
+            if (!currentChatOrderId) return;
+            if (currentChatClosed) { addNotification("Чат завершён", "error"); return; }
+            
+            const order = allOrders.find(o => o.id == currentChatOrderId);
+            if (!order) return;
+            
+            const input = document.getElementById("chatInput");
+            const text = input.value.trim();
+            if (!text && !pendingAdminChatImage) return;
+            
+            const msg = {
+                sender: "admin",
+                text,
+                time: new Date().toLocaleString("ru-RU"),
+                timestamp: Date.now()
+            };
+            if (pendingAdminChatImage) msg.image = pendingAdminChatImage;
+            
+            order.messages = order.messages || [];
+            order.messages.push(msg);
+            
+            await updateOrderInAPI(order);
+            input.value = '';
+            clearAdminChatImage();
+            renderChatMessages(order);
+            addNotification(`Ответ отправлен клиенту #${order.id}`, "success");
+        }
+        
+        async function updateOrderInAPI(order) {
+            try {
+                const res = await fetch(ORDERS_API);
+                const records = await res.json();
+                const record = records.find(r => JSON.parse(r.data).id == order.id);
+                if (record) {
+                    await fetch(`${ORDERS_API}/${record.id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ...record, data: JSON.stringify(order) })
+                    });
+                }
+            } catch (e) {
+                console.error("Ошибка синхронизации:", e);
+            }
+        }
+        
+        // ========== ПОЛЬЗОВАТЕЛИ ==========
+        function renderUsersList() {
+            const container = document.getElementById("usersList");
+            
+            const userMap = new Map();
+            allOrders.forEach(o => {
+                if (o.customer?.phone) {
+                    const phone = o.customer.phone;
+                    if (!userMap.has(phone)) {
+                        userMap.set(phone, {
+                            name: o.customer.name,
+                            phone,
+                            orders: 0,
+                            total: 0,
+                            lastDate: o.date
+                        });
+                    }
+                    const u = userMap.get(phone);
+                    u.orders++;
+                    u.total += o.total || 0;
+                    if (o.date > u.lastDate) u.lastDate = o.date;
+                }
+            });
+            
+            const usersList = Array.from(userMap.values());
+            
+            if (!usersList.length) {
+                container.innerHTML = "<p>Нет данных о клиентах</p>";
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>Имя</th><th>Телефон</th><th>Заказов</th><th>Потрачено</th><th>Последний заказ</th></tr></thead><tbody>';
+            usersList.sort((a, b) => b.orders - a.orders).forEach(u => {
+                html += `<tr>
+                    <td>${escapeHtml(u.name || "—")}</td>
+                    <td>${escapeHtml(u.phone)}</td>
+                    <td>${u.orders}</td>
+                    <td>${u.total} ₽</td>
+                    <td>${u.lastDate}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // ========== ОТЗЫВЫ ==========
+        function renderReviewsList() {
+            const container = document.getElementById("reviewsList");
+            if (!allReviews.length) {
+                container.innerHTML = "<p>Отзывов нет</p>";
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>Автор</th><th>Оценка</th><th>Текст</th><th>Дата</th><th>Действия</th></tr></thead><tbody>';
+            allReviews.slice().reverse().forEach(r => {
+                html += `<tr>
+                    <td>${escapeHtml(r.name)}</td>
+                    <td>${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</td>
+                    <td>${escapeHtml(r.text?.substring(0, 30))}...</td>
+                    <td>${r.date}</td>
+                    <td>
+                        <button class="btn btn-info" onclick="showReviewDetail('${r.id}')">📋</button>
+                        <button class="btn btn-delete" onclick="deleteReview('${r.id}')">🗑</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function showReviewDetail(reviewId) {
+            const review = allReviews.find(r => r.id == reviewId);
+            if (!review) return;
+            document.getElementById("reviewDetailContent").innerHTML = `
+                <p><strong>Автор:</strong> ${escapeHtml(review.name)}</p>
+                <p><strong>Оценка:</strong> ${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</p>
+                <p><strong>Дата:</strong> ${review.date}</p>
+                <p><strong>Текст:</strong><br>${escapeHtml(review.text)}</p>
+            `;
+            document.getElementById("reviewDetailModal").classList.add("active");
+        }
+        
+        function closeReviewDetail() {
+            document.getElementById("reviewDetailModal").classList.remove("active");
+        }
+        
+        async function deleteReview(id) {
+            if (!confirm("Удалить отзыв?")) return;
+            try {
+                await fetch(`${REVIEWS_API}/${id}`, { method: "DELETE" });
+                addNotification("Отзыв удалён", "error");
+                await loadAllData();
+            } catch (e) {
+                addNotification("Ошибка удаления", "error");
+            }
+        }
+        
+        async function deleteAllReviews() {
+            if (!confirm("Удалить ВСЕ отзывы?")) return;
+            try {
+                const res = await fetch(REVIEWS_API);
+                const records = await res.json();
+                for (const r of records) {
+                    await fetch(`${REVIEWS_API}/${r.id}`, { method: "DELETE" });
+                }
+                addNotification("Все отзывы удалены", "error");
+                await loadAllData();
+            } catch (e) {
+                addNotification("Ошибка", "error");
+            }
+        }
+        
+        // ========== ТОВАРЫ ==========
+        function renderProductsList() {
+            const container = document.getElementById("productsList");
+            if (!allProducts.length) {
+                container.innerHTML = "<p>Товаров нет</p>";
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>Изображения</th><th>Название</th><th>Цена</th><th>Категория</th><th>Действия</th></tr></thead><tbody>';
+            allProducts.forEach(p => {
+                const imagesHtml = (p.images || []).slice(0, 3).map(img => 
+                    `<img src="toys/${p.category}/${img}" class="product-thumb" onerror="this.style.display='none'">`
+                ).join("");
+                html += `<tr>
+                    <td><div class="product-images-preview">${imagesHtml || '—'}</div></td>
+                    <td>${escapeHtml(p.name)}</td>
+                    <td>${p.price} ₽</td>
+                    <td>${p.category}</td>
+                    <td>
+                        <button class="btn btn-edit" onclick="editProduct('${p.id}')">✏️</button>
+                        <button class="btn btn-delete" onclick="deleteProduct('${p.id}')">🗑</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function openAddCategoryModal() {
+            document.getElementById("addCategoryModal").classList.add("active");
+        }
+        
+        function closeAddCategoryModal() {
+            document.getElementById("addCategoryModal").classList.remove("active");
+            document.getElementById("newCatId").value = '';
+            document.getElementById("newCatName").value = '';
+            document.getElementById("newCatIcon").value = '';
+        }
+        
+        function addCategory() {
+            const id = document.getElementById("newCatId").value.trim();
+            const name = document.getElementById("newCatName").value.trim();
+            const icon = document.getElementById("newCatIcon").value.trim() || "📦";
+            if (!id || !name) { addNotification("Заполните ID и название", "error"); return; }
+            if (categories.find(c => c.id === id)) { addNotification("Категория уже существует", "error"); return; }
+            categories.push({ id, name, icon, description: "" });
+            closeAddCategoryModal();
+            renderProductsList();
+            renderJSON();
+            addNotification(`Категория "${name}" добавлена`, "success");
+        }
+        
+        function openAddProductModal() {
+            document.getElementById("productModalTitle").textContent = "➕ Новый товар";
+            document.getElementById("editingProductId").value = "";
+            document.getElementById("prodName").value = "";
+            document.getElementById("prodPrice").value = "";
+            document.getElementById("prodDesc").value = "";
+            const catSelect = document.getElementById("prodCategory");
+            catSelect.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+            tempImages = [];
+            renderTempImages();
+            document.getElementById("productModal").classList.add("active");
+        }
+        
+        function editProduct(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+            document.getElementById("productModalTitle").textContent = "✏️ Редактировать товар";
+            document.getElementById("editingProductId").value = productId;
+            document.getElementById("prodName").value = product.name;
+            document.getElementById("prodPrice").value = product.price;
+            document.getElementById("prodDesc").value = product.description || "";
+            const catSelect = document.getElementById("prodCategory");
+            catSelect.innerHTML = categories.map(c => `<option value="${c.id}" ${c.id === product.category ? 'selected' : ''}>${c.name}</option>`).join("");
+            tempImages = (product.images || []).map(img => ({ name: img, data: `toys/${product.category}/${img}` }));
+            renderTempImages();
+            document.getElementById("productModal").classList.add("active");
+        }
+        
+        function closeProductModal() {
+            document.getElementById("productModal").classList.remove("active");
+            tempImages = [];
+        }
+        
+        function renderTempImages() {
+            const container = document.getElementById("uploadedImages");
+            container.innerHTML = tempImages.map((img, idx) => `
+                <div class="uploaded-image">
+                    <img src="${img.data}" alt="preview">
+                    <button class="remove-image" onclick="removeTempImage(${idx})">×</button>
+                </div>
+            `).join("");
+        }
+        
+        function removeTempImage(idx) {
+            tempImages.splice(idx, 1);
+            renderTempImages();
+        }
+        
+        function saveProduct() {
+            const id = document.getElementById("editingProductId").value;
+            const name = document.getElementById("prodName").value.trim();
+            const price = parseInt(document.getElementById("prodPrice").value);
+            const description = document.getElementById("prodDesc").value.trim();
+            const category = document.getElementById("prodCategory").value;
+            
+            if (!name || !price) { addNotification("Заполните название и цену", "error"); return; }
+            
+            const imageNames = tempImages.map(img => img.name);
+            const product = {
+                id: id || Date.now().toString(),
+                name,
+                price,
+                description,
+                category,
+                images: imageNames
+            };
+            
+            if (id) {
+                const index = allProducts.findIndex(p => p.id === id);
+                if (index !== -1) allProducts[index] = product;
+            } else {
+                allProducts.push(product);
+            }
+            
+            const savedProducts = JSON.parse(localStorage.getItem("editedProducts") || "{}");
+            savedProducts[`${category}_${product.id}`] = product;
+            localStorage.setItem("editedProducts", JSON.stringify(savedProducts));
+            
+            closeProductModal();
+            renderProductsList();
+            renderJSON();
+            addNotification(id ? "Товар обновлён" : "Товар добавлен", "success");
+        }
+        
+        function deleteProduct(productId) {
+            if (!confirm("Удалить товар?")) return;
+            allProducts = allProducts.filter(p => p.id !== productId);
+            const savedProducts = JSON.parse(localStorage.getItem("editedProducts") || "{}");
+            for (let key in savedProducts) {
+                if (savedProducts[key].id === productId) delete savedProducts[key];
+            }
+            localStorage.setItem("editedProducts", JSON.stringify(savedProducts));
+            renderProductsList();
+            renderJSON();
+            addNotification("Товар удалён", "error");
+        }
+        
+        // Drag & Drop
+        function handleImageFiles(files) {
+            const maxImages = 3;
+            if (tempImages.length + files.length > maxImages) {
+                addNotification(`Можно загрузить не более ${maxImages} изображений`, "error");
+                return;
+            }
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    tempImages.push({ name: file.name, data: e.target.result });
+                    renderTempImages();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('imageInput');
+            if (dropZone) {
+                dropZone.addEventListener('click', () => fileInput.click());
+                dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+                dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+                    handleImageFiles(files);
+                });
+                fileInput.addEventListener('change', (e) => handleImageFiles(Array.from(e.target.files)));
+            }
+        });
+        
+        // ========== JSON ==========
+        function renderJSON() {
+            const data = { categories, products: allProducts };
+            document.getElementById("jsonDisplay").textContent = JSON.stringify(data, null, 2);
+        }
+        
+        function copyJSON() {
+            navigator.clipboard.writeText(document.getElementById("jsonDisplay").textContent);
+            addNotification("JSON скопирован", "success");
+        }
+        
+        function downloadJSON() {
+            const blob = new Blob([document.getElementById("jsonDisplay").textContent], { type: "application/json" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "data.json";
+            a.click();
+            addNotification("JSON скачан", "success");
+        }
+        
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ==========
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/[&<>]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[m]);
+        }
+        
+        function switchTab(tabId) {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            
+            event.target.classList.add("active");
+            document.getElementById(`tab-${tabId}`).classList.add("active");
+            
+            if (tabId === "dashboard") renderDashboard();
+            if (tabId === "orders") renderOrdersList();
+            if (tabId === "chat") renderChatOrdersList();
+            if (tabId === "users") renderUsersList();
+            if (tabId === "reviews") renderReviewsList();
+            if (tabId === "products") renderProductsList();
+            if (tabId === "json") renderJSON();
+        }
+        
+        // ========== АВТООБНОВЛЕНИЕ ==========
+        setInterval(async () => {
+            if (localStorage.getItem("adminAuth") === "true") {
+                const oldOrders = allOrders.length;
+                const oldPending = allOrders.reduce((s, o) => s + (o.messages || []).filter(m => m.sender === "customer" && !m.approved).length, 0);
+                
+                await loadAllData();
+                
+                const newOrders = allOrders.length;
+                const newPending = allOrders.reduce((s, o) => s + (o.messages || []).filter(m => m.sender === "customer" && !m.approved).length, 0);
+                
+                if (newOrders > oldOrders) {
+                    addNotification(`📦 Новый заказ! Всего: ${newOrders}`, "success");
+                }
+                if (newPending > oldPending) {
+                    addNotification(`💬 Новое сообщение в чате!`, "warning");
+                }
+                
+                if (currentChatOrderId) {
+                    const order = allOrders.find(o => o.id == currentChatOrderId);
+                    if (order) renderChatMessages(order);
+                }
+            }
+        }, 5000);
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        if (localStorage.getItem("adminAuth") === "true") {
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("adminContent").style.display = "block";
+            loadAllData();
+        }
+    </script>
+</body>
+</html>
