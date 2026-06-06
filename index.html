@@ -947,7 +947,7 @@
         
         collectUserData();
 
-        // ========== МАСКА ТЕЛЕФОНА (БЕЗ ПРИНУДИТЕЛЬНОГО +7) ==========
+        // ========== МАСКА ТЕЛЕФОНА ==========
         function formatPhone(value) {
             let digits = value.replace(/\D/g, '');
             if (digits.length === 0) return '';
@@ -1104,7 +1104,7 @@
             }
             let filtered = allProducts.filter(p => (currentCategory === "all" || p.category === currentCategory) && (!searchQuery || p.name.toLowerCase().includes(searchQuery) || (p.description && p.description.toLowerCase().includes(searchQuery))));
             if (!filtered.length) { grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:100px; background:white; border-radius:30px;'>🔍 Ничего не найдено</div>"; return; }
-            grid.innerHTML = filtered.map(product => `<div class="product-card"><div class="product-gallery"><div class="gallery-container" id="gallery-${product.id}" data-current="0">${(product.images && product.images.length ? product.images : ["placeholder.jpg"]).map(img => `<div class="gallery-slide"><img src="toys/${product.category}/${encodeURIComponent(img)}" alt="${escapeHtml(product.name)}" onerror="this.src='data:image/svg+xml,%3Csvg%3E%3C/svg%3E'"></div>`).join("")}</div>${(product.images && product.images.length > 1 ? `<button class="gallery-arrow left" onclick="prevImage('${product.id}')">←</button><button class="gallery-arrow right" onclick="nextImage('${product.id}')">→</button><div class="gallery-nav">${product.images.map((_, i) => `<span class="gallery-dot ${i===0?"active":""}" onclick="goToSlide('${product.id}',${i})"></span>`).join("")}</div>` : "")}</div><div class="product-info"><h3 class="product-name">${escapeHtml(product.name)}</h3><p class="product-description">${escapeHtml(product.description || "")}</p><div class="product-price">${product.price} ₽</div><div class="product-actions">${cart.some(item => item.id === product.id) ? `<button class="remove-from-cart-btn" onclick="removeFromCart('${product.id}')">❌ Удалить</button>` : `<button class="add-to-cart-btn" onclick="addToCart('${product.id}')">🛒 В корзину</button>`}</div></div></div>`).join("");
+            grid.innerHTML = filtered.map(product => `<div class="product-card"><div class="product-gallery"><div class="gallery-container" id="gallery-${product.id}" data-current="0" data-product-id="${product.id}">${(product.images && product.images.length ? product.images : ["placeholder.jpg"]).map(img => `<div class="gallery-slide"><img src="toys/${product.category}/${encodeURIComponent(img)}" alt="${escapeHtml(product.name)}" onerror="this.src='data:image/svg+xml,%3Csvg%3E%3C/svg%3E'"></div>`).join("")}</div>${(product.images && product.images.length > 1 ? `<button class="gallery-arrow left" onclick="prevImage('${product.id}')">←</button><button class="gallery-arrow right" onclick="nextImage('${product.id}')">→</button><div class="gallery-nav">${product.images.map((_, i) => `<span class="gallery-dot ${i===0?"active":""}" onclick="goToSlide('${product.id}',${i})"></span>`).join("")}</div>` : "")}</div><div class="product-info"><h3 class="product-name">${escapeHtml(product.name)}</h3><p class="product-description">${escapeHtml(product.description || "")}</p><div class="product-price">${product.price} ₽</div><div class="product-actions">${cart.some(item => item.id === product.id) ? `<button class="remove-from-cart-btn" onclick="removeFromCart('${product.id}')">❌ Удалить</button>` : `<button class="add-to-cart-btn" onclick="addToCart('${product.id}')">🛒 В корзину</button>`}</div></div></div>`).join("");
             initGalleries();
         }
         
@@ -1115,6 +1115,7 @@
                 let startX = 0, currentTranslate = 0, currentIndex = parseInt(container.dataset.current) || 0;
                 const slidesCount = container.children.length;
                 if (slidesCount <= 1) return;
+                const productId = container.dataset.productId;
                 container.addEventListener('touchstart', (e) => {
                     startX = e.touches[0].clientX;
                     currentTranslate = currentIndex * -100;
@@ -1128,10 +1129,10 @@
                 container.addEventListener('touchend', (e) => {
                     const diff = e.changedTouches[0].clientX - startX;
                     if (Math.abs(diff) > 30) {
-                        if (diff > 0 && currentIndex > 0) goToSlide(container.parentElement.parentElement.querySelector('.product-name').innerText, currentIndex - 1);
-                        else if (diff < 0 && currentIndex < slidesCount - 1) goToSlide(container.parentElement.parentElement.querySelector('.product-name').innerText, currentIndex + 1);
-                        else goToSlide(container.parentElement.parentElement.querySelector('.product-name').innerText, currentIndex);
-                    } else goToSlide(container.parentElement.parentElement.querySelector('.product-name').innerText, currentIndex);
+                        if (diff > 0 && currentIndex > 0) goToSlide(productId, currentIndex - 1);
+                        else if (diff < 0 && currentIndex < slidesCount - 1) goToSlide(productId, currentIndex + 1);
+                        else goToSlide(productId, currentIndex);
+                    } else goToSlide(productId, currentIndex);
                 });
             });
         }
@@ -1308,16 +1309,19 @@
                     enableChat(order.id);
                     window.updateUserOrders('', name, phone);
                     try {
-                        const itemsHtml = itemsSnapshot.map(i => `<div style="margin-bottom: 6px;">${escapeHtml(i.name)} — ${i.price} ₽</div>`).join("");
+                        const itemsText = itemsSnapshot.map(i => `${escapeHtml(i.name)} — ${i.price} ₽`).join("\n");
                         const adminData = { 
                             customer_name: name, customer_phone: phone, customer_email: '', 
                             delivery: deliveryMethod, address: deliveryAddress, comment: comment || "—", 
-                            order_items: itemsHtml, order_total: total + " ₽",
-                            order_id: order.id, order_date: order.date
+                            order_items: itemsText, 
+                            order_total: total + " ₽",
+                            order_id: order.id, 
+                            order_date: order.date
                         };
                         await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.adminTemplateId, adminData);
-                        // Уведомление о письме убрано
-                    } catch(emailError) { addNotification("⚠️ Заказ принят, но письмо не отправлено", "info"); }
+                    } catch(emailError) { 
+                        addNotification("⚠️ Заказ принят, но письмо не отправлено", "info"); 
+                    }
                 } else { throw new Error('API error'); }
             } catch (error) {
                 console.error('Order error:', error);
